@@ -183,7 +183,10 @@ export class PipelineApi {
 
   getPipelines(
     organizationId: string | number,
-    queryParams?: Partial<PaginationQueryParams> & { favorites?: boolean },
+    queryParams?: Partial<PaginationQueryParams> & {
+      favorites?: boolean;
+      search?: string;
+    },
   ) {
     const url = buildUrlWithParams(
       `/organizations/${organizationId}/pipelines`,

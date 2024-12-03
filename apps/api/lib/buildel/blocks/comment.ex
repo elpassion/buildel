@@ -2,7 +2,7 @@ defmodule Buildel.Blocks.Comment do
   use Buildel.Blocks.NewBlock
 
   defblock(:comment,
-    description: "",
+    description: "Block for adding comments to the workflow",
     groups: ["utils"]
   )
 

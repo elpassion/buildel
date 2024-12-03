@@ -30,10 +30,16 @@ type DateQueryParams = {
 export class KnowledgeBaseApi {
   constructor(private client: typeof fetchTyped) {}
 
-  async getCollections(organizationId: string | number) {
+  async getCollections(
+    organizationId: string | number,
+    queryParams?: Partial<PaginationQueryParams>,
+  ) {
     return this.client(
       KnowledgeBaseCollectionListResponse,
-      `/organizations/${organizationId}/memory_collections`,
+      buildUrlWithParams(
+        `/organizations/${organizationId}/memory_collections`,
+        queryParams,
+      ),
     );
   }
 

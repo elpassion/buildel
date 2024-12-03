@@ -11,8 +11,11 @@ import type {
   Alias,
   ExtendedPipeline,
   InterfaceConfig,
-  InterfaceConfigForm,
+  InterfaceConfigFormOutputProperty,
   InterfaceConfigFormProperty,
+  InterfaceConfigProperty,
+  InterfaceFormConfigForm,
+  InterfaceWebchatConfigForm,
   Pipeline,
   PipelineCost,
   PipelineCosts,
@@ -79,9 +82,19 @@ export type IBlockTypes = z.TypeOf<typeof BlockTypes>;
 export type IBlockType = z.TypeOf<typeof BlockType>;
 
 export type IInterfaceConfig = z.infer<typeof InterfaceConfig>;
-export type IInterfaceConfigForm = z.infer<typeof InterfaceConfigForm>;
+
+export type IInterfaceWebchatConfigForm = z.infer<
+  typeof InterfaceWebchatConfigForm
+>;
+export type IInterfaceFormConfigForm = z.infer<typeof InterfaceFormConfigForm>;
+
+export type IInterfaceConfigProperty = z.infer<typeof InterfaceConfigProperty>;
 export type IInterfaceConfigFormProperty = z.infer<
   typeof InterfaceConfigFormProperty
+>;
+
+export type IInterfaceConfigFormOutputProperty = z.infer<
+  typeof InterfaceConfigFormOutputProperty
 >;
 
 export type IPipeline = z.infer<typeof Pipeline>;

@@ -158,6 +158,18 @@ defmodule BuildelWeb.OrganizationPipelineController do
           description: "Filter by favorite",
           schema: %Schema{type: :boolean},
           required: false
+        ],
+        search: [
+          in: :query,
+          description: "Search query",
+          schema: %Schema{type: :string},
+          required: false
+        ],
+        sort: [
+          in: :query,
+          description: "Sort query",
+          schema: %Schema{type: :string},
+          required: false
         ]
       ] ++
         BuildelWeb.Schemas.Pagination.default_params(%{

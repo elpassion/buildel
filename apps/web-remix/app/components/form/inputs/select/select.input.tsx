@@ -11,7 +11,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({ ...props }) => {
   return (
     <ClientOnly
       fallback={
-        <div className="w-full h-[44px] rounded-lg border-[1.5px] border-input bg-white" />
+        <div className="w-full h-[40px] rounded-lg border-[1.5px] border-input bg-white" />
       }
     >
       {() => <AsyncSelectInputComponent {...props} />}

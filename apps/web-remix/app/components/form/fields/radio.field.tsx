@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import type * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
-import { useControlField } from 'remix-validated-form';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
+import { useControlField } from '~/components/form/fields/form.field';
 import type { RadioInputProps } from '~/components/form/inputs/radio.input';
 import {
   RadioInput,

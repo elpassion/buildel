@@ -6,9 +6,9 @@ import React, {
   useState,
 } from 'react';
 import debounce from 'lodash.debounce';
+import get from 'lodash.get';
 import startCase from 'lodash.startcase';
 import { ChevronDown, Trash } from 'lucide-react';
-import { useFieldArray, useFormContext } from 'remix-validated-form';
 
 import { asyncSelectApi } from '~/api/AsyncSelectApi';
 import { toSelectOption } from '~/components/form/fields/asyncSelect.field';
@@ -16,6 +16,10 @@ import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
 import { Field as FormField } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
+import {
+  useCurrentFormState,
+  useFieldArray,
+} from '~/components/form/fields/form.field';
 import { QuantityInputField } from '~/components/form/fields/quantity.field';
 import {
   RadioGroupField,
@@ -35,6 +39,7 @@ import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { usePipelineId } from '~/hooks/usePipelineId';
 import { assert } from '~/utils/assert';
 import { cn } from '~/utils/cn';
+import { useFormContext } from '~/utils/form';
 
 import { Field, Schema } from './Schema';
 import type { FieldProps } from './Schema';
@@ -50,7 +55,11 @@ export function StringField({
   assert(name);
   assert(field.type === 'string');
 
-  const { fieldErrors, getValues } = useFormContext();
+  const { values, fieldErrors } = useCurrentFormState();
+
+  const getValues = () => {
+    return values;
+  };
 
   const error = fieldErrors[name] ?? undefined;
 
@@ -103,7 +112,7 @@ export function StringField({
     if ('defaultWhen' in field && field.defaultWhen) {
       const formValues = getValues();
       const defaultKey = Object.keys(field.defaultWhen)[0];
-      const defaultFieldValue = formValues.get(defaultKey);
+      const defaultFieldValue = get(formValues, defaultKey);
 
       if (typeof defaultFieldValue === 'string') {
         defaultValue = field.defaultWhen[defaultKey][defaultFieldValue];
@@ -174,7 +183,9 @@ export function NumberField({
 }: FieldProps) {
   assert(name);
   assert(field.type === 'number' || field.type === 'integer');
-  const { fieldErrors } = useFormContext();
+  const {
+    formState: { fieldErrors },
+  } = useFormContext();
 
   const error = fieldErrors[name] ?? undefined;
 
@@ -271,13 +282,13 @@ function RealArrayField({
   ...rest
 }: FieldProps) {
   assert(field.type === 'array');
-  const [rhfFields, { push, remove }] = useFieldArray(name!);
+  const rhfFields = useFieldArray(name!);
 
   useEffect(() => {
-    if (rhfFields.length >= field.minItems) return;
+    if (rhfFields.length() >= field.minItems) return;
 
-    push({});
-  }, [push, rhfFields.length]);
+    rhfFields.push({});
+  }, [rhfFields]);
 
   if (shouldDisplay && !shouldDisplay(field)) return null;
 
@@ -286,25 +297,27 @@ function RealArrayField({
       <Label>{field.title}</Label>
       <InputMessage className="mt-0">{field.description}</InputMessage>
       <div
-        className={cn('flex flex-col gap-4', { 'mt-2': rhfFields.length > 0 })}
+        className={cn('flex flex-col gap-4', {
+          'mt-2': rhfFields.length() > 0,
+        })}
       >
-        {rhfFields.map((item, index) => (
-          <div key={item.key} className="relative flex flex-col gap-1">
+        {rhfFields.map((key, _item, index) => (
+          <div key={key} className="relative flex flex-col gap-1">
             <IconButton
               size="xxs"
               variant="ghost"
               className="absolute bottom-14 right-0"
               aria-label="Remove field"
               icon={<Trash />}
-              disabled={rhfFields.length <= field.minItems || rest.disabled}
+              disabled={rhfFields.length() <= field.minItems || rest.disabled}
               onClick={(e) => {
                 e.preventDefault();
-                remove(index);
+                rhfFields.remove(index);
               }}
             />
 
             <Field
-              key={item.key}
+              key={key}
               field={field.items}
               name={`${name}[${index}]`}
               fields={fields}
@@ -318,7 +331,7 @@ function RealArrayField({
         type="button"
         size="xs"
         variant="outline"
-        onClick={() => push({})}
+        onClick={() => rhfFields.push({})}
         className="mt-4"
         disabled={rest.disabled}
         isFluid
@@ -409,10 +422,9 @@ function SectionFieldPreviewItem({
   fullKey,
   name,
 }: SectionFieldPreviewItemProps) {
-  const { getValues } = useFormContext();
-  const values = getValues();
+  const { values } = useCurrentFormState();
 
-  const propertyValue = values.get(fullKey)?.toString() ?? '';
+  const propertyValue = get(values, fullKey)?.toString() ?? '';
 
   if (!propertyValue) return null;
 
@@ -463,7 +475,9 @@ interface SectionFieldErrorsProps {
 }
 
 function SectionFieldErrors({ name }: SectionFieldErrorsProps) {
-  const { fieldErrors } = useFormContext();
+  const {
+    formState: { fieldErrors },
+  } = useFormContext();
 
   const errors = useMemo(() => {
     if (!name) return {};
@@ -550,7 +564,12 @@ function SectionFieldPreviewAsyncItem({
   const organizationId = useOrganizationId();
   const pipelineId = usePipelineId();
 
-  const { getValues } = useFormContext();
+  const { values } = useCurrentFormState();
+
+  const getValues = () => {
+    return values;
+  };
+
   const context = getValues();
 
   const [finalValue, setFinalValue] = useState(value);
@@ -562,7 +581,7 @@ function SectionFieldPreviewAsyncItem({
       .replace(/{{([\w.]+)}}/g, (_fullMatch, key) => {
         const cleanedKey = key.replace(/^[^.]+\./, '');
 
-        const replacedValue = context.get(key)?.toString();
+        const replacedValue = get(context, key)?.toString();
 
         return replacedValue ?? cleanedKey;
       });
@@ -599,7 +618,7 @@ function SectionFieldPreviewAsyncItem({
     return () => {
       debouncedFetchOptions.cancel();
     };
-  }, [url, value]);
+  }, [url]);
 
   return (
     <SectionFieldPreviewItemWrapper title={finalValue}>

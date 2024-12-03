@@ -2,8 +2,7 @@ import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useState } from 'react';
 import type { Blocker, Location } from '@remix-run/react';
 import { useBlocker } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
-import { useFormContext, ValidatedForm } from 'remix-validated-form';
+import get from 'lodash.get';
 import type { z } from 'zod';
 
 import type { ExtendedBlockConfig } from '~/api/blockType/blockType.contracts';
@@ -21,6 +20,7 @@ import {
 } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
+import { useCurrentFormState } from '~/components/form/fields/form.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import type { FieldProps } from '~/components/form/schema/Schema';
 import { Schema } from '~/components/form/schema/Schema';
@@ -47,6 +47,7 @@ import { prepareBlockConnections } from '~/components/pages/pipelines/PipelineFl
 import { successToast } from '~/components/toasts/successToast';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 import { assert } from '~/utils/assert';
+import { useFormContext, ValidatedForm, withZod } from '~/utils/form';
 
 export function EditBlockForm({
   onSubmit,
@@ -143,15 +144,9 @@ export function EditBlockForm({
     [connections],
   );
 
-  const handleUpdate = (
-    data: Record<string, any>,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
+  const handleUpdate = (data: Record<string, any>) => {
     clearFieldsErrors();
-
     if (blocker.state === 'blocked') blocker.reset();
-
     const newConfig = { oldName: blockConfig.name, ...blockConfig, ...data };
     if (
       newConfig.oldName !== newConfig.name &&
@@ -231,7 +226,11 @@ export function EditBlockForm({
         return;
       }
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { fieldErrors, getValues } = useFormContext();
+      const { values, fieldErrors } = useCurrentFormState();
+
+      const getValues = () => {
+        return values;
+      };
 
       const replacedUrl = props.field.url
         .replace('{{organization_id}}', organizationId.toString())
@@ -239,7 +238,7 @@ export function EditBlockForm({
         .replace('{{block_name}}', blockConfig.name)
         .replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
           const values = getValues();
-          const replacedValue = values.get(optKey);
+          const replacedValue = get(values, optKey);
 
           return replacedValue || optKey;
         });
@@ -250,7 +249,7 @@ export function EditBlockForm({
         ?.replace('{{block_name}}', blockConfig.name)
         ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
           const values = getValues();
-          const replacedValue = values.get(optKey);
+          const replacedValue = get(values, optKey);
 
           return replacedValue || optKey;
         });
@@ -258,7 +257,7 @@ export function EditBlockForm({
       if ('defaultWhen' in props.field && props.field.defaultWhen) {
         const formValues = getValues();
         const defaultKey = Object.keys(props.field.defaultWhen)[0];
-        const defaultFieldValue = formValues.get(defaultKey);
+        const defaultFieldValue = get(formValues, defaultKey);
 
         if (typeof defaultFieldValue === 'string') {
           defaultValue = (props.field.defaultWhen as any)[defaultKey][
@@ -298,16 +297,18 @@ export function EditBlockForm({
         return;
       }
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { fieldErrors, getValues } = useFormContext();
+      const { values, fieldErrors } = useCurrentFormState();
 
-      const values = getValues();
+      const getValues = () => {
+        return values;
+      };
 
       const replacedUrl = props.field.url
         .replace('{{organization_id}}', organizationId.toString())
         .replace('{{pipeline_id}}', pipelineId.toString())
         .replace('{{block_name}}', blockConfig.name)
         .replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
-          const replacedValue = values.get(optKey);
+          const replacedValue = get(values, optKey);
           return replacedValue || optKey;
         });
 
@@ -315,7 +316,7 @@ export function EditBlockForm({
 
       if ('descriptionWhen' in props.field && props.field.descriptionWhen) {
         const defaultKey = Object.keys(props.field.descriptionWhen)[0];
-        const defaultFieldDescription = values.get(defaultKey);
+        const defaultFieldDescription = get(values, defaultKey);
 
         if (typeof defaultFieldDescription === 'string') {
           description =
@@ -331,7 +332,7 @@ export function EditBlockForm({
         ?.replace('{{block_name}}', blockConfig.name)
         ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
           const values = getValues();
-          const replacedValue = values.get(optKey);
+          const replacedValue = get(values, optKey);
 
           return replacedValue || optKey;
         });
@@ -339,7 +340,7 @@ export function EditBlockForm({
       if ('defaultWhen' in props.field && props.field.defaultWhen) {
         const formValues = getValues();
         const defaultKey = Object.keys(props.field.defaultWhen)[0];
-        const defaultFieldValue = formValues.get(defaultKey);
+        const defaultFieldValue = get(formValues, defaultKey);
 
         if (typeof defaultFieldValue === 'string') {
           defaultValue = (props.field.defaultWhen as any)[defaultKey][
@@ -392,7 +393,8 @@ export function EditBlockForm({
       // @ts-ignore
       validator={validator}
       defaultValues={blockConfig}
-      onSubmit={handleUpdate}
+      submitSource="state"
+      handleSubmit={handleUpdate}
       className="w-full grow flex flex-col"
       onChange={(e: any) => {
         setLatestValues((prev) => ({ ...prev, [e.target.id]: e.target.value }));

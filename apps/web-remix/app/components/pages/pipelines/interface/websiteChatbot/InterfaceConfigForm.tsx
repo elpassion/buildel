@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { Trash } from 'lucide-react';
-import { FieldArray, ValidatedForm } from 'remix-validated-form';
 
 import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
 import { Field } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
+import type { FieldArrayApi } from '~/components/form/fields/form.field';
+import { FieldArray } from '~/components/form/fields/form.field';
 import { SelectField } from '~/components/form/fields/select.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
@@ -18,6 +18,7 @@ import type {
 } from '~/components/pages/pipelines/pipeline.types';
 import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 
 import { schema } from './schema';
@@ -47,11 +48,7 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
     ['audio_output'].includes(block.type),
   );
 
-  const handleOnSubmit = (
-    data: IInterfaceConfig,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
+  const handleOnSubmit = (data: IInterfaceConfig) => {
     const inputs = data.webchat.inputs.map((input) => {
       const parsed = JSON.parse(input as unknown as string);
       return {
@@ -105,7 +102,7 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
       defaultValues={toSelectDefaults(pipeline.interface_config) as any}
       validator={validator}
       noValidate
-      onSubmit={handleOnSubmit}
+      handleSubmit={handleOnSubmit}
     >
       <div className="flex flex-col gap-3">
         <div className="w-full grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 items-center">
@@ -172,9 +169,13 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
           to view the chatbot's history.
         </p>
 
-        <FieldArray<string> name="webchat.suggested_messages">
-          {(items, { push, remove }) => (
-            <SuggestedMessages items={items} onAdd={push} onRemove={remove} />
+        <FieldArray<string[]> name="webchat.suggested_messages">
+          {(items) => (
+            <SuggestedMessages
+              items={items}
+              onAdd={items.push}
+              onRemove={items.remove}
+            />
           )}
         </FieldArray>
       </div>
@@ -187,7 +188,7 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
 };
 
 interface SuggestedMessageProps {
-  items: { key: string; defaultValue: string }[];
+  items: FieldArrayApi<string[]>;
   onAdd: (item: string) => void;
   onRemove: (index: number) => void;
 }
@@ -197,24 +198,26 @@ function SuggestedMessages({ items, onAdd, onRemove }: SuggestedMessageProps) {
       <Label className="mb-2 block">Suggested messages</Label>
 
       <div className="flex flex-col gap-2">
-        {items.map((message, index) => (
-          <div key={message.key} className="flex gap-1 items-center w-full">
-            <Field name={`webchat.suggested_messages.${index}`}>
-              <TextInputField
-                placeholder="e.g. What are the best action movies?"
-                defaultValue={message.defaultValue}
-              />
-            </Field>
+        {items.map((key, message, index) => {
+          return (
+            <div key={key} className="flex gap-1 items-center w-full">
+              <Field name={`webchat.suggested_messages.${index}`}>
+                <TextInputField
+                  placeholder="e.g. What are the best action movies?"
+                  defaultValue={message.defaultValue()}
+                />
+              </Field>
 
-            <IconButton
-              type="button"
-              size="xxs"
-              onClick={() => onRemove(index)}
-              variant="ghost"
-              icon={<Trash />}
-            />
-          </div>
-        ))}
+              <IconButton
+                type="button"
+                size="xxs"
+                onClick={() => onRemove(index)}
+                variant="ghost"
+                icon={<Trash />}
+              />
+            </div>
+          );
+        })}
       </div>
 
       <Button

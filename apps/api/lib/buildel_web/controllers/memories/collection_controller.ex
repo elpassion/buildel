@@ -1,6 +1,6 @@
 defmodule BuildelWeb.CollectionController do
   alias Buildel.Memories.MemoryCollectionSearch
-
+  alias OpenApiSpex.Schema
   import BuildelWeb.UserAuth
 
   use BuildelWeb, :controller
@@ -94,7 +94,13 @@ defmodule BuildelWeb.CollectionController do
     summary: "List collections",
     parameters: [
       organization_id: [in: :path, description: "Organization ID", type: :integer],
-      collection_name: [in: :query, description: "Collection name", type: :string]
+      collection_name: [in: :query, description: "Collection name", type: :string],
+      search: [
+        in: :query,
+        description: "Search query",
+        schema: %Schema{type: :string},
+        required: false
+      ]
     ],
     request_body: nil,
     responses: [

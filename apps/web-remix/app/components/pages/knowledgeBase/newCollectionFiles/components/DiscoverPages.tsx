@@ -5,8 +5,6 @@ import {
   useNavigate,
   useRevalidator,
 } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
-import { ValidatedForm } from 'remix-validated-form';
 import { z } from 'zod';
 
 import { Field } from '~/components/form/fields/field.context';
@@ -21,6 +19,7 @@ import { loadingToast } from '~/components/toasts/loadingToast';
 import { CheckboxTree } from '~/components/treeSelect/CheckboxTree';
 import type { TreeNodeType } from '~/components/treeSelect/Tree.types';
 import { Button } from '~/components/ui/button';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 
 export const DiscoverPages = () => {
@@ -137,17 +136,12 @@ interface DiscoverPagesFormProps {
 function DiscoverPagesForm({ onSubmit, loading }: DiscoverPagesFormProps) {
   const validator = useMemo(() => withZod(DiscoverSchema), []);
 
-  const submit = (
-    data: z.TypeOf<typeof DiscoverSchema>,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
-
+  const submit = (data: z.TypeOf<typeof DiscoverSchema>) => {
     onSubmit(data);
   };
 
   return (
-    <ValidatedForm validator={validator} onSubmit={submit} noValidate>
+    <ValidatedForm validator={validator} handleSubmit={submit} noValidate>
       <Field name="url">
         <FieldLabel>Website</FieldLabel>
         <div className="relative w-full">

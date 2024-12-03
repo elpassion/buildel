@@ -1,4 +1,5 @@
-import React, { ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import React from 'react';
 import type { CellContext } from '@tanstack/react-table';
 
 import { CellText } from '~/components/table/table.components';

@@ -1,8 +1,6 @@
 import React, { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { useFetcher, useLoaderData, useNavigate } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
-import { ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
 
 import { CreateDatasetRowSchema } from '~/api/datasets/datasets.contracts';
@@ -18,6 +16,7 @@ import {
   DialogDrawerHeader,
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
@@ -35,12 +34,7 @@ export function DatasetRowNew() {
     navigate(routes.dataset(organizationId, datasetId, pagination));
   };
 
-  const onCreate = (
-    { data }: z.TypeOf<typeof CreateDatasetRowSchema>,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
-
+  const onCreate = ({ data }: z.TypeOf<typeof CreateDatasetRowSchema>) => {
     fetcher.submit({ data }, { method: 'POST' });
   };
 
@@ -60,7 +54,7 @@ export function DatasetRowNew() {
                 id="new-dataset-row-form"
                 noValidate
                 validator={validator}
-                onSubmit={onCreate}
+                handleSubmit={onCreate}
                 defaultValues={{ data: '{}' }}
               >
                 <Field name="data">

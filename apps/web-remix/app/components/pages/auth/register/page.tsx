@@ -1,8 +1,6 @@
 import * as React from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { Link, useLoaderData, useSearchParams } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { Field, HiddenField } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
@@ -15,6 +13,7 @@ import { SubmitButton } from '~/components/form/submit';
 import { GithubButton } from '~/components/githubAuth/GithubButton';
 import { GoogleButton } from '~/components/googleAuth/GoogleButton';
 import { SocialSignInForm } from '~/components/socialAuth/SocialSignInForm';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 
 import type { loader } from './loader.server';
@@ -79,7 +78,14 @@ export function RegisterPage() {
         {googleLoginEnabled && (
           <>
             <span className="my-3 text-muted-foreground text-sm">Or</span>
-            <SocialSignInForm action="/auth/google" className="max-w-md mb-4">
+            <SocialSignInForm
+              action={
+                redirectTo
+                  ? `/auth/google?redirectTo=${redirectTo}`
+                  : '/auth/google'
+              }
+              className="max-w-md mb-4"
+            >
               <GoogleButton content="Sign up with Google" />
             </SocialSignInForm>
             <SocialSignInForm action="/auth/github" className="max-w-md">
@@ -95,6 +101,7 @@ export function RegisterPage() {
           href="https://buildel.ai/terms-and-conditions"
           target="_blank"
           className="font-semibold hover:underline"
+          rel="noreferrer"
         >
           terms of service
         </a>{' '}
@@ -103,6 +110,7 @@ export function RegisterPage() {
           href="https://buildel.ai/privacy-policy"
           target="_blank"
           className="font-semibold hover:underline"
+          rel="noreferrer"
         >
           privacy policy
         </a>

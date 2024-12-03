@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { useCallback, useState } from 'react';
-import { useControlField } from 'remix-validated-form';
+import { useCallback, useEffect, useState } from 'react';
+import { useField } from '@rvf/remix';
 import { useIsMounted } from 'usehooks-ts';
 
 import type { IAsyncSelectItem } from '~/api/AsyncSelectApi';
@@ -39,15 +39,18 @@ export const AsyncSelectField = ({
       whenSubmitted: 'onBlur',
     },
   });
-  const [selectedId, setSelectedId] = useControlField<string | undefined>(name);
+
+  const { getControlProps, onChange } = useField<string | undefined>(name);
+
+  const selectedId = getControlProps().value;
+
   const [apiError, setApiError] = useState<string | undefined>();
 
-  const onChange = (id: string) => {
-    setSelectedId(id);
-    try {
-      validate();
-    } catch (error) {}
-  };
+  useEffect(() => {
+    if (defaultValue && !selectedId) {
+      onChange(defaultValue);
+    }
+  }, [defaultValue, selectedId]);
 
   const fetcher = useCallback(
     async (_search: string, args?: RequestInit) => {
@@ -61,8 +64,9 @@ export const AsyncSelectField = ({
         .then((opts) => opts.map(toSelectOption))
         .then((opts) => {
           const curr = opts.find((o) => o.value === selectedId);
+
           if (!curr && isMounted()) {
-            setSelectedId(undefined);
+            onChange(undefined);
             validate();
           }
           if (opts.length > 0) setApiError(undefined);
@@ -82,7 +86,6 @@ export const AsyncSelectField = ({
         onBlur={getInputProps().onBlur}
         placeholder="Select..."
         fetchOptions={fetcher}
-        defaultValue={defaultValue}
         onChange={onChange}
         value={selectedId}
         data-testid={id}

@@ -1,7 +1,6 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import React from 'react';
 import { Maximize2 } from 'lucide-react';
-import { useControlField } from 'remix-validated-form';
 import { useBoolean } from 'usehooks-ts';
 
 import {
@@ -10,6 +9,7 @@ import {
 } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
+import { useControlField } from '~/components/form/fields/form.field';
 import type { EditorInputProps } from '~/components/form/inputs/editor.input';
 import { EditorInput } from '~/components/form/inputs/editor.input';
 import { IconButton } from '~/components/iconButton';

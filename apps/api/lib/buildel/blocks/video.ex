@@ -2,7 +2,7 @@ defmodule Buildel.Blocks.Video do
   use Buildel.Blocks.NewBlock
 
   defblock(:video,
-    description: "",
+    description: "Block for adding YouTube videos to the workflow",
     groups: ["utils"]
   )
 

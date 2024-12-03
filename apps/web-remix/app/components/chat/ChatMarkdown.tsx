@@ -456,6 +456,7 @@ function Image({
     <a
       href={rest.src}
       target="_blank"
+      rel="noreferrer"
       className="relative w-fit inline-block my-1 group overflow-hidden rounded-md bg-primary/10"
     >
       <img
@@ -472,6 +473,7 @@ function Image({
           <img
             src={getFaviconFromDomain(new URL(rest.src as string))}
             className="w-4 h-4 object-contain object-center m-0"
+            alt={rest.src}
           />
         ) : null}
         <span className="truncate">{removeUrlProtocol(rest.src)}</span>

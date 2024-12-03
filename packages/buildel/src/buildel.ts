@@ -305,7 +305,12 @@ export class BuildelRun {
     if (this.status !== "running") return;
 
     if (payload instanceof File) {
-      throw new Error("Please send files through REST API");
+      assert(this.channel);
+
+      this.channel.push(
+        `input:${topic}`,
+        await this.encodeBinaryMessage(payload),
+      );
     } else if (payload instanceof FileList) {
       throw new Error("Please send files through REST API");
     } else if (payload instanceof Blob) {
@@ -441,7 +446,9 @@ export class BuildelRun {
       credentials: "include",
       body: JSON.stringify({
         socket_id: this.id,
-        channel_name: `pipelines:${this.organizationId}:${this.pipelineId}${runId ? `:${runId}` : ""}`,
+        channel_name: `pipelines:${this.organizationId}:${this.pipelineId}${
+          runId ? `:${runId}` : ""
+        }`,
       }),
     }).then((response) => {
       if (response.ok) {
@@ -471,5 +478,44 @@ export class BuildelRun {
       metadata: { ...payload?.metadata, created_at: payload?.created_at },
       chunk,
     };
+  }
+
+  private async encodeBinaryMessage(file: File): Promise<ArrayBuffer> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        const fileBuffer = event.target?.result as ArrayBuffer;
+
+        const metadata = {
+          file_name: file.name,
+          file_size: file.size,
+          file_type: file.type,
+        };
+
+        const metadataJSON = JSON.stringify(metadata);
+        const metadataBytes = new TextEncoder().encode(metadataJSON);
+
+        const metadataSize = metadataBytes.length;
+        const chunk = new Uint8Array(fileBuffer);
+        const totalSize = 4 + metadataSize + chunk.length;
+        const buffer = new ArrayBuffer(totalSize);
+        const view = new DataView(buffer);
+
+        view.setUint32(0, metadataSize, false);
+
+        new Uint8Array(buffer, 4, metadataSize).set(metadataBytes);
+
+        new Uint8Array(buffer, 4 + metadataSize).set(chunk);
+
+        resolve(buffer);
+      };
+
+      reader.onerror = (error) => {
+        reject(error);
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
   }
 }

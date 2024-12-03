@@ -1,7 +1,15 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { Outlet, useLoaderData, useMatch, useNavigate } from '@remix-run/react';
+import {
+  Outlet,
+  useLoaderData,
+  useMatch,
+  useNavigate,
+  useSearchParams,
+} from '@remix-run/react';
+import debounce from 'lodash.debounce';
 
+import { SearchInput } from '~/components/form/inputs/search.input.tsx';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
@@ -14,6 +22,8 @@ import {
   DialogDrawerHeader,
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
+import { useOrganizationId } from '~/hooks/useOrganizationId';
+import { cn } from '~/utils/cn';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
@@ -21,7 +31,8 @@ import { KnowledgeBaseCollectionList } from './KnowledgeBaseCollectionList';
 import type { loader } from './loader.server';
 
 export function KnowledgeBasePage() {
-  const { organizationId, collections } = useLoaderData<typeof loader>();
+  const { organizationId, collections, search } =
+    useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const matchNew = useMatch(routes.knowledgeBaseNew(organizationId));
   const isNewSidebarOpen = !!matchNew;
@@ -34,13 +45,7 @@ export function KnowledgeBasePage() {
     <>
       <AppNavbar
         leftContent={<AppNavbarHeading>Knowledge base</AppNavbarHeading>}
-      >
-        <Button asChild className="w-fit ml-auto mr-0 hidden lg:flex">
-          <BasicLink to={routes.knowledgeBaseNew(organizationId)}>
-            New collection
-          </BasicLink>
-        </Button>
-      </AppNavbar>
+      />
 
       <DialogDrawer open={isNewSidebarOpen} onOpenChange={handleCloseSidebar}>
         <DialogDrawerContent>
@@ -59,13 +64,7 @@ export function KnowledgeBasePage() {
       </DialogDrawer>
 
       <PageContentWrapper className="mt-6">
-        <div className="mb-3 flex justify-end lg:hidden">
-          <Button size="sm" asChild>
-            <BasicLink to={routes.knowledgeBaseNew(organizationId)}>
-              New collection
-            </BasicLink>
-          </Button>
-        </div>
+        <CollectionsFilter defaultValues={{ search }} className="-mt-1 mb-10" />
 
         <KnowledgeBaseCollectionList
           organizationId={organizationId}
@@ -83,3 +82,59 @@ export const meta: MetaFunction = metaWithDefaults(() => {
     },
   ];
 });
+
+type CollectionsFilterProps = React.HTMLAttributes<HTMLDivElement> & {
+  defaultValues?: {
+    search?: string;
+  };
+};
+
+function CollectionsFilter({
+  defaultValues,
+  className,
+  children,
+  ...rest
+}: CollectionsFilterProps) {
+  const [_, setSearchParams] = useSearchParams();
+  const organizationId = useOrganizationId();
+
+  const onSearchChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchParams((prev) => {
+      prev.set('search', e.target.value);
+
+      return prev;
+    });
+  }, 500);
+
+  const onSearchClear = () => {
+    setSearchParams((prev) => {
+      prev.set('search', '');
+
+      return prev;
+    });
+  };
+
+  return (
+    <div
+      className={cn('w-full flex gap-2 items-center justify-end', className)}
+      {...rest}
+    >
+      <SearchInput
+        placeholder="Search Collections"
+        onClear={onSearchClear}
+        onChange={onSearchChange}
+        autoFocus={!!defaultValues?.search}
+        defaultValue={defaultValues?.search}
+        key={defaultValues?.search}
+      />
+
+      <Button size="sm" asChild>
+        <BasicLink to={routes.knowledgeBaseNew(organizationId)}>
+          New collection
+        </BasicLink>
+      </Button>
+
+      {children}
+    </div>
+  );
+}

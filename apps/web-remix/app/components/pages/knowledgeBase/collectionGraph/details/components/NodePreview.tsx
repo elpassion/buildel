@@ -12,6 +12,7 @@ import {
   NEXT_NODE_COLOR,
   PREV_NODE_COLOR,
 } from '~/components/pages/knowledgeBase/collectionGraph/collectionGraph.utils';
+import type { SearchSchema } from '~/components/pages/knowledgeBase/search.schema';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { cn } from '~/utils/cn';

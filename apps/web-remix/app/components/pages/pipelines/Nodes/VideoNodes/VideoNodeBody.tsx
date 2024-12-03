@@ -1,6 +1,4 @@
 import React from 'react';
-import { withZod } from '@remix-validated-form/with-zod';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { HiddenField } from '~/components/form/fields/field.context';
 import { Schema } from '~/components/form/schema/Schema';
@@ -8,6 +6,7 @@ import { StringField } from '~/components/form/schema/SchemaFields';
 import { generateZODSchema } from '~/components/form/schema/SchemaParser';
 import { SubmitButton } from '~/components/form/submit';
 import type { IBlockConfig } from '~/components/pages/pipelines/pipeline.types';
+import { ValidatedForm, withZod } from '~/utils/form';
 
 interface VideoNodeBodyProps {
   data: IBlockConfig;
@@ -22,11 +21,7 @@ export const VideoNodeBody = ({
 }: VideoNodeBodyProps) => {
   const schema = generateZODSchema(data.block_type?.schema as any);
   const validator = React.useMemo(() => withZod(schema), []);
-  const handleSubmit = (
-    data: Record<string, any>,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
+  const handleSubmit = (data: Record<string, any>) => {
     onSubmit?.(data.opts);
   };
 
@@ -34,7 +29,7 @@ export const VideoNodeBody = ({
     <ValidatedForm
       // @ts-ignore
       validator={validator}
-      onSubmit={handleSubmit}
+      handleSubmit={handleSubmit}
       className="min-w-[300px]"
       noValidate
     >

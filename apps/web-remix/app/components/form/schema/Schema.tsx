@@ -1,4 +1,4 @@
-import { BaseSize } from '~/components/ui/ui.types';
+import type { BaseSize } from '~/components/ui/ui.types';
 import { assert } from '~/utils/assert';
 
 import type { JSONSchemaField } from './SchemaParser';

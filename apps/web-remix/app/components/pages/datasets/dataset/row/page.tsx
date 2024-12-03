@@ -1,8 +1,6 @@
 import React, { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { useFetcher, useLoaderData, useNavigate } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
-import { ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
 
 import { UpdateDatasetRowSchema } from '~/api/datasets/datasets.contracts';
@@ -19,6 +17,7 @@ import {
   DialogDrawerHeader,
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
@@ -36,12 +35,7 @@ export function DatasetRowPage() {
     navigate(routes.dataset(organizationId, datasetId, pagination));
   };
 
-  const onEdit = (
-    { data }: z.TypeOf<typeof UpdateDatasetRowSchema>,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
-
+  const onEdit = ({ data }: z.TypeOf<typeof UpdateDatasetRowSchema>) => {
     fetcher.submit({ data }, { method: 'PUT' });
   };
 
@@ -64,7 +58,7 @@ export function DatasetRowPage() {
                 id="dataset-row-form"
                 noValidate
                 validator={validator}
-                onSubmit={onEdit}
+                handleSubmit={onEdit}
                 defaultValues={{ data: JSON.stringify(row.data) }}
               >
                 <Field name="data">

@@ -1,12 +1,14 @@
 import { buildUrlWithParams } from '~/utils/url';
 
-type RouteParam = Record<string, string | number | boolean>;
+type RouteParam = Record<string, string | number | boolean | undefined>;
 
 export const routes = {
   dashboard: '/',
   agreements: '/agreements',
   login: '/login',
   register: '/register',
+  invitationAccept: (params: RouteParam = {}) =>
+    buildUrlWithParams('/invitation/accept', params),
   resetPassowrd: () => '/reset-password',
   resetPasswordSent: () => '/reset-password/sent',
   organizations: '/organizations',
@@ -30,8 +32,11 @@ export const routes = {
     `${routes.settings(organizationId)}/profile`,
   profileSettingsChangePassword: (organizationId: OrganizationId) =>
     `${routes.profileSettings(organizationId)}/change-password`,
-  pipelines: (organizationId: OrganizationId) =>
-    `${routes.organization(organizationId)}/pipelines`,
+  pipelines: (organizationId: OrganizationId, params: RouteParam = {}) =>
+    buildUrlWithParams(
+      `${routes.organization(organizationId)}/pipelines`,
+      params,
+    ),
   pipeline: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipelines(organizationId)}/${pipelineId}`,
   pipelineBuild: (

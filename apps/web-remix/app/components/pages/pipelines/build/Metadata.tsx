@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { FileText } from 'lucide-react';
-import { ValidatedForm } from 'remix-validated-form';
 import { z } from 'zod';
 
 import {
@@ -23,6 +21,7 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip';
 import { useBreakpoints } from '~/hooks/useBreakpoints';
+import { ValidatedForm, withZod } from '~/utils/form';
 
 export const Metadata = () => {
   const { isDesktop } = useBreakpoints();
@@ -87,12 +86,7 @@ function MetadataForm({ defaultValue, onSubmit }: MetadataFormProps) {
   const [key, setKey] = useState(new Date().getTime());
   const validator = React.useMemo(() => withZod(metadataSchema), []);
 
-  const handleOnSubmit = (
-    data: MetadataSchema,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
-
+  const handleOnSubmit = (data: MetadataSchema) => {
     if (!data.value) return onSubmit({});
     onSubmit(data.value);
 
@@ -110,7 +104,7 @@ function MetadataForm({ defaultValue, onSubmit }: MetadataFormProps) {
     <ValidatedForm
       key={key}
       defaultValues={{ value: defaultValue }}
-      onSubmit={handleOnSubmit}
+      handleSubmit={handleOnSubmit}
       validator={validator}
       noValidate
     >

@@ -1,9 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { useLoaderData, useMatch, useNavigate } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
 import startCase from 'lodash.startcase';
-import { ValidatedForm } from 'remix-validated-form';
 
 import type { IWorkflowTemplate } from '~/api/organization/organization.contracts';
 import { CreateFromTemplateSchema } from '~/api/organization/organization.contracts';
@@ -35,6 +33,7 @@ import {
 } from '~/components/ui/dialog-drawer';
 import { RadioGroup, RadioTabGroupItem } from '~/components/ui/radio-group';
 import { cn } from '~/utils/cn';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 

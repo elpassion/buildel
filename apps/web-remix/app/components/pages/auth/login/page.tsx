@@ -1,8 +1,6 @@
 import * as React from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { Link, useLoaderData, useSearchParams } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { Field, HiddenField } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
@@ -15,6 +13,7 @@ import { SubmitButton } from '~/components/form/submit';
 import { GithubButton } from '~/components/githubAuth/GithubButton';
 import { GoogleButton } from '~/components/googleAuth/GoogleButton';
 import { SocialSignInForm } from '~/components/socialAuth/SocialSignInForm';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
@@ -83,7 +82,14 @@ export function LoginPage() {
       {googleLoginEnabled && (
         <>
           <span className="my-3 text-muted-foreground text-sm">Or</span>
-          <SocialSignInForm action="/auth/google" className="max-w-md mb-4">
+          <SocialSignInForm
+            action={
+              redirectTo
+                ? `/auth/google?redirectTo=${redirectTo}`
+                : '/auth/google'
+            }
+            className="max-w-md mb-4"
+          >
             <GoogleButton />
           </SocialSignInForm>
           <SocialSignInForm action="/auth/github" className="max-w-md">

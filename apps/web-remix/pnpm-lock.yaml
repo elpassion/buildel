@@ -15,8 +15,8 @@ importers:
   .:
     dependencies:
       '@buildel/buildel':
-        specifier: 0.3.3
-        version: 0.3.3
+        specifier: 0.3.4
+        version: 0.3.4
       '@codemirror/autocomplete':
         specifier: 6.15.0
         version: 6.15.0(@codemirror/language@6.10.3)(@codemirror/state@6.4.1)(@codemirror/view@6.34.1)(@lezer/common@1.2.3)
@@ -101,9 +101,12 @@ importers:
       '@remix-run/serve':
         specifier: 2.13.1
         version: 2.13.1(typescript@5.6.3)
-      '@remix-validated-form/with-zod':
-        specifier: ^2.0.6
-        version: 2.0.7(remix-validated-form@5.1.5(@remix-run/node@2.13.1(typescript@5.6.3))(@remix-run/react@2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3))(@remix-run/server-runtime@2.13.1(typescript@5.6.3))(react@19.0.0-rc-eb3ad065-20240822)(types-react@19.0.0-rc.0))(zod@3.23.8)
+      '@rvf/remix':
+        specifier: ^6.3.0
+        version: 6.3.0(@remix-run/node@2.13.1(typescript@5.6.3))(@remix-run/react@2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3))(@remix-run/server-runtime@2.13.1(typescript@5.6.3))(@rvf/core@6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822))(@rvf/set-get@6.0.3)(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)
+      '@rvf/zod':
+        specifier: ^6.0.3
+        version: 6.0.3(@rvf/core@6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822))(@rvf/set-get@6.0.3)(zod@3.23.8)
       '@sentry/remix':
         specifier: ^7.74.1
         version: 7.119.2(@remix-run/node@2.13.1(typescript@5.6.3))(@remix-run/react@2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3))(react@19.0.0-rc-eb3ad065-20240822)
@@ -154,7 +157,7 @@ importers:
         version: 4.21.24(@babel/runtime@7.26.0)(@codemirror/autocomplete@6.15.0(@codemirror/language@6.10.3)(@codemirror/state@6.4.1)(@codemirror/view@6.34.1)(@lezer/common@1.2.3))(@codemirror/language@6.10.3)(@codemirror/lint@6.8.2)(@codemirror/search@6.5.7)(@codemirror/state@6.4.1)(@codemirror/theme-one-dark@6.1.2)(@codemirror/view@6.34.1)(codemirror@6.0.1(@lezer/common@1.2.3))(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)
       '@xyflow/react':
         specifier: ^12.0.1
-        version: 12.3.4(immer@9.0.21)(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(types-react@19.0.0-rc.0)
+        version: 12.3.4(immer@10.1.1)(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(types-react@19.0.0-rc.0)
       chokidar:
         specifier: ^3.5.3
         version: 3.6.0
@@ -284,9 +287,6 @@ importers:
       remix-utils:
         specifier: 7.6.0
         version: 7.6.0(@remix-run/node@2.13.1(typescript@5.6.3))(@remix-run/react@2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3))(@remix-run/router@1.20.0)(is-ip@5.0.1)(react@19.0.0-rc-eb3ad065-20240822)(zod@3.23.8)
-      remix-validated-form:
-        specifier: 5.1.5
-        version: 5.1.5(@remix-run/node@2.13.1(typescript@5.6.3))(@remix-run/react@2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3))(@remix-run/server-runtime@2.13.1(typescript@5.6.3))(react@19.0.0-rc-eb3ad065-20240822)(types-react@19.0.0-rc.0)
       sonner:
         specifier: 1.5.0
         version: 1.5.0(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)
@@ -637,8 +637,8 @@ packages:
   '@braintree/sanitize-url@6.0.4':
     resolution: {integrity: sha512-s3jaWicZd0pkP0jf5ysyHUI/RE7MHos6qlToFcGWXVp+ykHOy77OUMrfbgJ9it2C5bow7OIQwYYaHjk9XlBQ2A==}
 
-  '@buildel/buildel@0.3.3':
-    resolution: {integrity: sha512-KTTzs02sg3ZQ8Hix6/diRJgQrDIO07LYSDhE8to3VUxYaFgCnvNwi3LTmU56l+kv4oerR3i8BpiRAiRbDawUJw==}
+  '@buildel/buildel@0.3.4':
+    resolution: {integrity: sha512-P36fi0YyjJswfE4DdMOsSIXf5dHbhmsreHoSTBGIFwCPRaVY+NjVetWWBOH4Cp5G3JhCnAfXXMOTX2K8z/fsTw==}
 
   '@bundled-es-modules/cookie@2.0.0':
     resolution: {integrity: sha512-Or6YHg/kamKHpxULAdSqhGqnWFneIXu1NKvvfBBzKGwpVsYuFIQ5aBPHDnnoR3ghW1nvSkALd+EF9iMtY7Vjxw==}
@@ -1887,12 +1887,6 @@ packages:
   '@remix-run/web-stream@1.1.0':
     resolution: {integrity: sha512-KRJtwrjRV5Bb+pM7zxcTJkhIqWWSy+MYsIxHK+0m5atcznsf15YwUBWHWulZerV2+vvHH1Lp1DD7pw6qKW8SgA==}
 
-  '@remix-validated-form/with-zod@2.0.7':
-    resolution: {integrity: sha512-iytcQ9qlg3VRV9CXh33vTPnJcDdxmMPE6vZJj9oFh4Wf4kpQ2ck6s1jFOrpJxiwYRQrtlIzuR+JaWOa8pXwnfw==}
-    peerDependencies:
-      remix-validated-form: ^4.x || ^5.x
-      zod: '>= 3.11.0'
-
   '@replit/codemirror-lang-csharp@6.2.0':
     resolution: {integrity: sha512-6utbaWkoymhoAXj051mkRp+VIJlpwUgCX9Toevz3YatiZsz512fw3OVCedXQx+WcR0wb6zVHjChnuxqfCLtFVQ==}
     peerDependencies:
@@ -2030,6 +2024,38 @@ packages:
 
   '@rushstack/eslint-patch@1.10.4':
     resolution: {integrity: sha512-WJgX9nzTqknM393q1QJDJmoW28kUfEnybeTfVNcNAPnIx210RXm2DiXiHzfNPJNIUUb1tJnz/l4QGtJ30PgWmA==}
+
+  '@rvf/core@6.3.0':
+    resolution: {integrity: sha512-RgZFRlB7dqnu4pi2CcYIQyFjRRSR9h/UyAUahQhDXlcmVqtm7QNTwZOv/i7Thbj3MSh3jQZMrdly3X/+tDqtGQ==}
+    peerDependencies:
+      '@rvf/set-get': '>= 6.0.3 < 7.0.0'
+      react: 19.0.0-rc-eb3ad065-20240822
+
+  '@rvf/react@6.3.0':
+    resolution: {integrity: sha512-cDvm4bK2kKPCq6CjgsaIqjentmhXSSJ7VL8zg6LrfBYHw/seRd3ykE+Z5J9Np+PfUF3VmZTOGzOzD8/ijwt2GA==}
+    peerDependencies:
+      '@rvf/core': '>= 6.1.2 < 7.0.0'
+      '@rvf/set-get': '>= 6.0.3 < 7.0.0'
+      react: 19.0.0-rc-eb3ad065-20240822
+      react-dom: 19.0.0-rc-eb3ad065-20240822
+
+  '@rvf/remix@6.3.0':
+    resolution: {integrity: sha512-65/3RlxSqVUuBr2nDczlIkkvbSvEb0yXTesnq5t4Ncjcy96BSZhxTDmugrHOUKSxDtU6+rVGboksohryG2H+5Q==}
+    peerDependencies:
+      '@remix-run/node': '>= 1.16.1 <3.0.0'
+      '@remix-run/react': '>= 1.15.0 <3.0.0'
+      '@remix-run/server-runtime': '>= 1.16.1 <3.0.0'
+      react: 19.0.0-rc-eb3ad065-20240822
+
+  '@rvf/set-get@6.0.3':
+    resolution: {integrity: sha512-nv9r1Kr+eRaE9+e50atTqbNmobY7EiTGfh7OlDXyWe71nFK9XsQ3K4Tq1J/FsjrzhBGzGUGwLRxGd8/mxv+i6Q==}
+
+  '@rvf/zod@6.0.3':
+    resolution: {integrity: sha512-TiFbH6X5ru6ZJfip4oIT5MNlBO2trqZR9UqbkAAGDIzU+saw3A8C9yc/aAI9MdgEvQoerPRC68Tsze77cvdZHw==}
+    peerDependencies:
+      '@rvf/core': '>= 0.0.0 < 7.0.0'
+      '@rvf/set-get': '>= 6.0.3 < 7.0.0'
+      zod: '>= 3.11.0'
 
   '@sentry-internal/feedback@7.119.2':
     resolution: {integrity: sha512-bnR1yJWVBZfXGx675nMXE8hCXsxluCBfIFy9GQT8PTN/urxpoS9cGz+5F7MA7Xe3Q06/7TT0Mz3fcDvjkqTu3Q==}
@@ -4341,8 +4367,8 @@ packages:
   immediate@3.0.6:
     resolution: {integrity: sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==}
 
-  immer@9.0.21:
-    resolution: {integrity: sha512-bc4NBHqOqSfRW7POMkHd51LvClaeMXpm8dx0e8oE2GORbq5aRK7Bxl4FyzVLdGtLmvLKL7BTDBG5ACQm4HWjTA==}
+  immer@10.1.1:
+    resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
 
   import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
@@ -5195,11 +5221,6 @@ packages:
   mz@2.7.0:
     resolution: {integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==}
 
-  nanoid@3.3.6:
-    resolution: {integrity: sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA==}
-    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
-    hasBin: true
-
   nanoid@3.3.7:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
@@ -6002,9 +6023,6 @@ packages:
   remark-rehype@11.1.1:
     resolution: {integrity: sha512-g/osARvjkBXb6Wo0XvAeXQohVta8i84ACbenPpoSsxTOQH/Ae0/RGP4WZgnMH5pMLpsj4FG7OHmcIcXxpza8eQ==}
 
-  remeda@1.61.0:
-    resolution: {integrity: sha512-caKfSz9rDeSKBQQnlJnVW3mbVdFgxgGWQKq1XlFokqjf+hQD5gxutLGTTY2A/x24UxVyJe9gH5fAkFI63ULw4A==}
-
   remix-utils@7.6.0:
     resolution: {integrity: sha512-BPhCUEy+nwrhDDDg2v3+LFSszV6tluMbeSkbffj2o4tqZxt5Kn69Y9sNpGxYLAj8gjqeYDuxjv55of+gYnnykA==}
     engines: {node: '>=18.0.0'}
@@ -6040,14 +6058,6 @@ packages:
         optional: true
       zod:
         optional: true
-
-  remix-validated-form@5.1.5:
-    resolution: {integrity: sha512-v27JGzhOMGREyvPIDAgjhywfVYahe3CC4EXGIzJbwZfXnq7GFju5f/yNmyUyQLeYcOmU6uhzq+vwDJDOiXjvBA==}
-    peerDependencies:
-      '@remix-run/node': '>= 1.16.1'
-      '@remix-run/react': '>= 1.15.0'
-      '@remix-run/server-runtime': '>= 1.16.1'
-      react: 19.0.0-rc-eb3ad065-20240822
 
   require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
@@ -7331,7 +7341,7 @@ snapshots:
 
   '@braintree/sanitize-url@6.0.4': {}
 
-  '@buildel/buildel@0.3.3':
+  '@buildel/buildel@0.3.4':
     dependencies:
       phoenix: 1.7.14
       uuid: 9.0.1
@@ -8864,11 +8874,6 @@ snapshots:
     dependencies:
       web-streams-polyfill: 3.3.3
 
-  '@remix-validated-form/with-zod@2.0.7(remix-validated-form@5.1.5(@remix-run/node@2.13.1(typescript@5.6.3))(@remix-run/react@2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3))(@remix-run/server-runtime@2.13.1(typescript@5.6.3))(react@19.0.0-rc-eb3ad065-20240822)(types-react@19.0.0-rc.0))(zod@3.23.8)':
-    dependencies:
-      remix-validated-form: 5.1.5(@remix-run/node@2.13.1(typescript@5.6.3))(@remix-run/react@2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3))(@remix-run/server-runtime@2.13.1(typescript@5.6.3))(react@19.0.0-rc-eb3ad065-20240822)(types-react@19.0.0-rc.0)
-      zod: 3.23.8
-
   '@replit/codemirror-lang-csharp@6.2.0(@codemirror/autocomplete@6.15.0(@codemirror/language@6.10.3)(@codemirror/state@6.4.1)(@codemirror/view@6.34.1)(@lezer/common@1.2.3))(@codemirror/language@6.10.3)(@codemirror/state@6.4.1)(@codemirror/view@6.34.1)(@lezer/common@1.2.3)(@lezer/highlight@1.2.1)(@lezer/lr@1.4.2)':
     dependencies:
       '@codemirror/autocomplete': 6.15.0(@codemirror/language@6.10.3)(@codemirror/state@6.4.1)(@codemirror/view@6.34.1)(@lezer/common@1.2.3)
@@ -8965,6 +8970,39 @@ snapshots:
   '@rtsao/scc@1.1.0': {}
 
   '@rushstack/eslint-patch@1.10.4': {}
+
+  '@rvf/core@6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822)':
+    dependencies:
+      '@rvf/set-get': 6.0.3
+      immer: 10.1.1
+      react: 19.0.0-rc-eb3ad065-20240822
+
+  '@rvf/react@6.3.0(@rvf/core@6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822))(@rvf/set-get@6.0.3)(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)':
+    dependencies:
+      '@rvf/core': 6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822)
+      '@rvf/set-get': 6.0.3
+      react: 19.0.0-rc-eb3ad065-20240822
+      react-dom: 19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822)
+
+  '@rvf/remix@6.3.0(@remix-run/node@2.13.1(typescript@5.6.3))(@remix-run/react@2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3))(@remix-run/server-runtime@2.13.1(typescript@5.6.3))(@rvf/core@6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822))(@rvf/set-get@6.0.3)(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)':
+    dependencies:
+      '@remix-run/node': 2.13.1(typescript@5.6.3)
+      '@remix-run/react': 2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3)
+      '@remix-run/server-runtime': 2.13.1(typescript@5.6.3)
+      '@rvf/react': 6.3.0(@rvf/core@6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822))(@rvf/set-get@6.0.3)(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)
+      react: 19.0.0-rc-eb3ad065-20240822
+    transitivePeerDependencies:
+      - '@rvf/core'
+      - '@rvf/set-get'
+      - react-dom
+
+  '@rvf/set-get@6.0.3': {}
+
+  '@rvf/zod@6.0.3(@rvf/core@6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822))(@rvf/set-get@6.0.3)(zod@3.23.8)':
+    dependencies:
+      '@rvf/core': 6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822)
+      '@rvf/set-get': 6.0.3
+      zod: 3.23.8
 
   '@sentry-internal/feedback@7.119.2':
     dependencies:
@@ -10131,13 +10169,13 @@ snapshots:
 
   '@web3-storage/multipart-parser@1.0.0': {}
 
-  '@xyflow/react@12.3.4(immer@9.0.21)(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(types-react@19.0.0-rc.0)':
+  '@xyflow/react@12.3.4(immer@10.1.1)(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(types-react@19.0.0-rc.0)':
     dependencies:
       '@xyflow/system': 0.0.45
       classcat: 5.0.5
       react: 19.0.0-rc-eb3ad065-20240822
       react-dom: 19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822)
-      zustand: 4.5.5(immer@9.0.21)(react@19.0.0-rc-eb3ad065-20240822)(types-react@19.0.0-rc.0)
+      zustand: 4.5.5(immer@10.1.1)(react@19.0.0-rc-eb3ad065-20240822)(types-react@19.0.0-rc.0)
     transitivePeerDependencies:
       - '@types/react'
       - immer
@@ -12097,7 +12135,7 @@ snapshots:
 
   immediate@3.0.6: {}
 
-  immer@9.0.21: {}
+  immer@10.1.1: {}
 
   import-fresh@3.3.0:
     dependencies:
@@ -13256,8 +13294,6 @@ snapshots:
       object-assign: 4.1.1
       thenify-all: 1.6.0
 
-  nanoid@3.3.6: {}
-
   nanoid@3.3.7: {}
 
   natural-compare-lite@1.4.0: {}
@@ -14166,8 +14202,6 @@ snapshots:
       unified: 11.0.5
       vfile: 6.0.3
 
-  remeda@1.61.0: {}
-
   remix-utils@7.6.0(@remix-run/node@2.13.1(typescript@5.6.3))(@remix-run/react@2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3))(@remix-run/router@1.20.0)(is-ip@5.0.1)(react@19.0.0-rc-eb3ad065-20240822)(zod@3.23.8):
     dependencies:
       type-fest: 4.26.1
@@ -14178,21 +14212,6 @@ snapshots:
       is-ip: 5.0.1
       react: 19.0.0-rc-eb3ad065-20240822
       zod: 3.23.8
-
-  remix-validated-form@5.1.5(@remix-run/node@2.13.1(typescript@5.6.3))(@remix-run/react@2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3))(@remix-run/server-runtime@2.13.1(typescript@5.6.3))(react@19.0.0-rc-eb3ad065-20240822)(types-react@19.0.0-rc.0):
-    dependencies:
-      '@remix-run/node': 2.13.1(typescript@5.6.3)
-      '@remix-run/react': 2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3)
-      '@remix-run/server-runtime': 2.13.1(typescript@5.6.3)
-      immer: 9.0.21
-      lodash.get: 4.4.2
-      nanoid: 3.3.6
-      react: 19.0.0-rc-eb3ad065-20240822
-      remeda: 1.61.0
-      tiny-invariant: 1.3.3
-      zustand: 4.5.5(immer@9.0.21)(react@19.0.0-rc-eb3ad065-20240822)(types-react@19.0.0-rc.0)
-    transitivePeerDependencies:
-      - '@types/react'
 
   require-directory@2.1.1: {}
 
@@ -15296,12 +15315,12 @@ snapshots:
 
   zod@3.23.8: {}
 
-  zustand@4.5.5(immer@9.0.21)(react@19.0.0-rc-eb3ad065-20240822)(types-react@19.0.0-rc.0):
+  zustand@4.5.5(immer@10.1.1)(react@19.0.0-rc-eb3ad065-20240822)(types-react@19.0.0-rc.0):
     dependencies:
       use-sync-external-store: 1.2.2(react@19.0.0-rc-eb3ad065-20240822)
     optionalDependencies:
       '@types/react': types-react@19.0.0-rc.0
-      immer: 9.0.21
+      immer: 10.1.1
       react: 19.0.0-rc-eb3ad065-20240822
 
   zwitch@2.0.4: {}

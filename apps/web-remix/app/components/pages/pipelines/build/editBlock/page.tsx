@@ -13,6 +13,8 @@ import type {
   IBlockConfig,
   IConfigConnection,
   IInterfaceConfig,
+  IInterfaceConfigFormOutputProperty,
+  IInterfaceConfigProperty,
   INode,
   IPipeline,
 } from '~/components/pages/pipelines/pipeline.types';
@@ -199,15 +201,19 @@ function validateInterfaceConfigs(
     },
     form: {
       ...interfaces.form,
-      inputs: interfaces.form.inputs.map(validate),
-      outputs: interfaces.form.outputs.map(validate),
+      inputs: interfaces.form.inputs.map(
+        validate,
+      ) as IInterfaceConfigFormProperty[],
+      outputs: interfaces.form.outputs.map(
+        validate,
+      ) as IInterfaceConfigFormOutputProperty[],
     },
   };
 }
 
-function validateInterfaceProperty(updated: IExtendedBlockConfig) {
-  return (property: IInterfaceConfigFormProperty) => {
-    const updatedProperty: IInterfaceConfigFormProperty = { ...property };
+function validateInterfaceProperty<T>(updated: IExtendedBlockConfig) {
+  return (property: IInterfaceConfigProperty) => {
+    const updatedProperty: IInterfaceConfigProperty = { ...property };
 
     if (property.name === updated.oldName) {
       updatedProperty.name = updated.name;

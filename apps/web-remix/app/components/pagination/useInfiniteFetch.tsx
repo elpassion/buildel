@@ -36,10 +36,11 @@ export const useInfiniteFetch = <T, R>(args: UseInfiniteFetchProps<T, R>) => {
       page: state.page,
       per_page: state.per_page,
       search: state.search,
+      sort: state.sort,
     });
 
     fetcher.load(urlWithParams);
-  }, [state.page, state.per_page, state.search]);
+  }, [state.page, state.per_page, state.search, state.sort]);
 
   useEffect(() => {
     const newData = args.dataExtractor(fetcher);
@@ -92,6 +93,7 @@ type InfiniteFetchReducerState<T = {}> = {
   totalItems: number;
   totalPages: number;
   search?: string;
+  sort?: string;
 };
 
 export const infiniteFetchReducer = <T,>(

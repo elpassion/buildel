@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import React from 'react';
-import { useControlField, useFormContext } from 'remix-validated-form';
 
 import {
   HiddenField,
@@ -8,8 +7,10 @@ import {
 } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
+import { useControlField } from '~/components/form/fields/form.field';
 import { SelectInput } from '~/components/form/inputs/select/select.input';
 import type { SelectInputProps } from '~/components/form/inputs/select/select.input-impl.client';
+import { useFormContext } from '~/utils/form';
 
 interface SelectFieldProps extends SelectInputProps {
   label?: ReactNode;
@@ -28,7 +29,9 @@ export const SelectField = ({
   const { name, getInputProps } = useFieldContext();
   const [selectedId, setSelectedId] = useControlField<string | string[]>(name);
 
-  const { fieldErrors } = useFormContext();
+  const {
+    formState: { fieldErrors },
+  } = useFormContext();
 
   return (
     <div>
@@ -40,7 +43,7 @@ export const SelectField = ({
         }
         {...getInputProps()}
       />
-      <FieldLabel>{label}</FieldLabel>
+      {label ? <FieldLabel>{label}</FieldLabel> : null}
       <SelectInput
         id={name}
         options={options}

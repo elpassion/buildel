@@ -1,9 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { MetaFunction } from '@remix-run/node';
-import { Outlet, useFetcher, useLoaderData } from '@remix-run/react';
+import {
+  Outlet,
+  useFetcher,
+  useLoaderData,
+  useSearchParams,
+} from '@remix-run/react';
+import debounce from 'lodash.debounce';
 import { BookmarkCheck } from 'lucide-react';
 
+import { SearchInput } from '~/components/form/inputs/search.input.tsx';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { confirm } from '~/components/modal/confirm';
@@ -12,7 +19,14 @@ import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
 import { useInfiniteFetch } from '~/components/pagination/useInfiniteFetch';
 import { Button } from '~/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from '~/components/ui/select';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
+import { cn } from '~/utils/cn';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
@@ -28,29 +42,36 @@ import {
 export function PipelinesPage() {
   const { pagination, organizationId } = useLoaderData<typeof loader>();
 
+  const pipelinesContent = useMemo(() => {
+    if (pagination.search || pagination.totalItems > 0) {
+      return (
+        <ContentWithFilters search={pagination.search} sort={pagination.sort} />
+      );
+    }
+
+    return <TemplatesWithoutPipelines organizationId={organizationId} />;
+  }, [
+    organizationId,
+    pagination.search,
+    pagination.totalItems,
+    pagination.sort,
+  ]);
+
   return (
     <>
-      <PipelinesNavbar>
-        <Button asChild className="hidden w-fit ml-auto mr-0 lg:flex">
-          <BasicLink
-            to={routes.pipelinesNew(organizationId)}
-            aria-label="Create new workflow"
-          >
-            New Workflow
-          </BasicLink>
-        </Button>
-      </PipelinesNavbar>
+      <PipelinesNavbar />
 
       <Outlet />
 
       <PageContentWrapper className="grid grid-cols-1 gap-8 mt-6 lg:grid-cols-1">
-        {pagination.totalItems > 0 ? (
-          <ContentWithPipelines key={routes.pipelines(organizationId)} />
-        ) : null}
-
-        {pagination.totalItems === 0 ? (
-          <TemplatesWithoutPipelines organizationId={organizationId} />
-        ) : null}
+        <React.Fragment
+          key={routes.pipelines(organizationId, {
+            search: pagination.search,
+            sort: pagination.sort,
+          })}
+        >
+          {pipelinesContent}
+        </React.Fragment>
       </PageContentWrapper>
     </>
   );
@@ -121,6 +142,28 @@ function TemplatesWithoutPipelines({
   );
 }
 
+interface ContentWithFiltersProps {
+  search: string;
+  sort?: string;
+}
+
+function ContentWithFilters({ search, sort }: ContentWithFiltersProps) {
+  const organizationId = useOrganizationId();
+  return (
+    <>
+      <PipelinesFilter
+        defaultValues={{ search, sort }}
+        className="-mt-1 mb-10"
+      />
+      <ContentWithPipelines
+        key={routes.pipelines(organizationId, {
+          search,
+        })}
+      />
+    </>
+  );
+}
+
 function ContentWithPipelines() {
   const { ref: fetchNextRef, inView } = useInView();
   const { pipelines, pagination, favorites } = useLoaderData<typeof loader>();
@@ -168,22 +211,9 @@ function ContentWithPipelines() {
   return (
     <>
       <div className="flex-grow order-2 lg:order-1">
-        <Button
-          asChild
-          size="sm"
-          className="mb-3 w-fit ml-auto mr-0 flex lg:hidden"
-        >
-          <BasicLink
-            to={routes.pipelinesNew(organizationId)}
-            aria-label="Create new workflow"
-          >
-            New Workflow
-          </BasicLink>
-        </Button>
-
         {favorites.length > 0 ? (
-          <div className="-mt-11 lg:mt-auto">
-            <h2 className="text-white mb-3 text-base flex gap-1 items-center capitalize">
+          <div>
+            <h2 className="text-foreground mb-3 text-base flex gap-1 items-center capitalize">
               <BookmarkCheck className="w-5 h-5" />{' '}
               <span>Pinned workflows</span>
             </h2>
@@ -285,4 +315,84 @@ function useToggleWorkflow({
   }, [toggleFavoriteFetcher]);
 
   return { action };
+}
+
+type PipelinesFilterProps = React.HTMLAttributes<HTMLDivElement> & {
+  defaultValues?: {
+    search?: string;
+    sort?: string;
+  };
+};
+
+function PipelinesFilter({
+  defaultValues,
+  className,
+  children,
+  ...rest
+}: PipelinesFilterProps) {
+  const [_, setSearchParams] = useSearchParams();
+  const organizationId = useOrganizationId();
+
+  const onSearchChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchParams((prev) => {
+      prev.set('search', e.target.value);
+
+      return prev;
+    });
+  }, 500);
+
+  const onSearchClear = () => {
+    setSearchParams((prev) => {
+      prev.set('search', '');
+
+      return prev;
+    });
+  };
+
+  const onSortChange = (value: string) => {
+    setSearchParams((prev) => {
+      prev.set('sort', value);
+      return prev;
+    });
+  };
+
+  return (
+    <div
+      className={cn('w-full flex gap-2 items-center justify-end', className)}
+      {...rest}
+    >
+      <SearchInput
+        placeholder="Search Workflows"
+        onClear={onSearchClear}
+        onChange={onSearchChange}
+        autoFocus={!!defaultValues?.search}
+        defaultValue={defaultValues?.search}
+      />
+
+      <Select
+        onValueChange={onSortChange}
+        defaultValue={defaultValues?.sort ?? 'inserted_at'}
+      >
+        <SelectTrigger className="w-[80px]" size="sm">
+          Sort
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="inserted_at">Created At</SelectItem>
+          <SelectItem value="updated_at">Updated At</SelectItem>
+          <SelectItem value="name">Name</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Button size="sm" asChild>
+        <BasicLink
+          to={routes.pipelinesNew(organizationId)}
+          aria-label="Create new workflow"
+        >
+          New Workflow
+        </BasicLink>
+      </Button>
+
+      {children}
+    </div>
+  );
 }

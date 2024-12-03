@@ -1,7 +1,5 @@
 import React, { useMemo } from 'react';
 import { useLoaderData } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { UpdateSecretSchema } from '~/api/secrets/secrets.contracts';
 import { AsyncSelectField } from '~/components/form/fields/asyncSelect.field';
@@ -22,9 +20,10 @@ import {
   DialogDrawerHeader,
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
+import { ValidatedForm, withZod } from '~/utils/form';
 
 import type { ISecretKey } from '../variables.types';
-import { loader } from './loader.server';
+import type { loader } from './loader.server';
 
 interface EditSecretModalProps {
   isOpen: boolean;

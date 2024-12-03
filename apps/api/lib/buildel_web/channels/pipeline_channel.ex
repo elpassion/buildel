@@ -36,6 +36,18 @@ defmodule BuildelWeb.PipelineChannel do
           created_at: Map.get(metadata, "_broadcast_date")
         }
       end
+
+      def from_binary(
+            <<metadata_size::32, metadata_json::bytes-size(metadata_size), content::binary>>
+          ) do
+        metadata = Jason.decode!(metadata_json)
+
+        %{
+          metadata: metadata,
+          message: content,
+          created_at: nil
+        }
+      end
     end
   end
 
@@ -206,6 +218,36 @@ defmodule BuildelWeb.PipelineChannel do
       created_at: log.inserted_at
     }
   end
+
+#  defp process_input(input, data, run) do
+#    [block_name, input_name] = input |> String.split(":")
+#    context_id = Pipelines.Worker.context_id(run)
+#
+#    %{data: data, metadata: metadata} =
+#      case data do
+#        {:binary, content} ->
+#          block_type =
+#            run.interface_config
+#            |> Map.get("inputs", [])
+#            |> Enum.find(%{}, fn input -> Map.get(input, "name") == block_name end)
+#            |> Map.get("type")
+#
+#          if block_type == "file_input" or block_type == "image_input" do
+#            %{metadata: metadata, message: file} = Text.from_binary(content)
+#            {:ok, path} = Temp.path(suffix: metadata |> Map.get("file_name"))
+#            File.write!(path, file)
+#
+#            %{data: {:binary, path}, metadata: metadata}
+#          else
+#            %{data: data, metadata: %{}}
+#          end
+#
+#        _ ->
+#          %{data: {:text, data}, metadata: %{}}
+#      end
+#
+#    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, metadata)
+#  end
 
   defp process_input(input, data, run) do
     [block_name, input_name] = input |> String.split(":")

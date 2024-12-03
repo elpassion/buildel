@@ -3,14 +3,14 @@ import { MessageCircle } from 'lucide-react';
 
 import { IconButton, IconButtonProps } from '~/components/iconButton';
 import { BasicLink } from '~/components/link/BasicLink';
-import { IInterfaceConfigForm } from '~/components/pages/pipelines/pipeline.types';
+import { IInterfaceWebchatConfigForm } from '~/components/pages/pipelines/pipeline.types';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { usePipelineId } from '~/hooks/usePipelineId';
 import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
 export interface FloatingChatProps {
-  config: IInterfaceConfigForm;
+  config: IInterfaceWebchatConfigForm;
   chatUrl: string;
 }
 

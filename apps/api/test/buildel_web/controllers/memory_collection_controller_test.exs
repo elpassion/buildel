@@ -73,6 +73,38 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
       assert [%{"id" => ^collection_id}] = response["data"]
       assert_schema(response, "CollectionIndexResponse", api_spec)
     end
+
+    test "lists all organization collections with search query", %{
+      conn: conn,
+      organization: organization,
+      api_spec: api_spec
+    } do
+      %{id: collection_id} =
+        collection_fixture(%{organization_id: organization.id, collection_name: "topic"})
+
+      conn =
+        get(conn, ~p"/api/organizations/#{organization}/memory_collections?search=topic")
+
+      response = json_response(conn, 200)
+      assert [%{"id" => ^collection_id}] = response["data"]
+      assert_schema(response, "CollectionIndexResponse", api_spec)
+    end
+
+    test "do not lists all organization collections when not matching search query", %{
+      conn: conn,
+      organization: organization,
+      api_spec: api_spec
+    } do
+      %{id: collection_id} =
+        collection_fixture(%{organization_id: organization.id, collection_name: "topic"})
+
+      conn =
+        get(conn, ~p"/api/organizations/#{organization}/memory_collections?search=TEST")
+
+      response = json_response(conn, 200)
+      assert [] = response["data"]
+      assert_schema(response, "CollectionIndexResponse", api_spec)
+    end
   end
 
   describe "show" do

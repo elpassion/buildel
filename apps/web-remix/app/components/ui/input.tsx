@@ -6,17 +6,13 @@ import { cn } from '~/utils/cn';
 export interface InputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   size?: BaseSize;
+  ref?:
+    | React.RefObject<HTMLInputElement | null>
+    | ((instance: HTMLInputElement | null) => void)
+    | null;
 }
 
-const Input = ({
-  ref,
-  className,
-  type,
-  size,
-  ...props
-}: InputProps & {
-  ref?: React.RefObject<HTMLInputElement | null>;
-}) => {
+const Input = ({ ref, className, type, size, ...props }: InputProps) => {
   return (
     <input
       type={type}

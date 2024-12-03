@@ -15,7 +15,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@buildel/buildel": "0.3.3",
+    "@buildel/buildel": "0.3.4",
     "@codemirror/autocomplete": "6.15.0",
     "@dagrejs/dagre": "^1.1.3",
     "@fastify/early-hints": "^1.0.1",
@@ -44,7 +44,8 @@
     "@remix-run/node": "2.13.1",
     "@remix-run/react": "2.13.1",
     "@remix-run/serve": "2.13.1",
-    "@remix-validated-form/with-zod": "^2.0.6",
+    "@rvf/remix": "^6.3.0",
+    "@rvf/zod": "^6.0.3",
     "@sentry/remix": "^7.74.1",
     "@tailwindcss/forms": "^0.5.4",
     "@tanstack/react-table": "^8.12.0",
@@ -105,7 +106,6 @@
     "recharts": "2.13.0-alpha.4",
     "rehype-raw": "7.0.0",
     "remix-utils": "7.6.0",
-    "remix-validated-form": "5.1.5",
     "sonner": "1.5.0",
     "source-map-support": "^0.5.21",
     "tailwind-merge": "^2.4.0",

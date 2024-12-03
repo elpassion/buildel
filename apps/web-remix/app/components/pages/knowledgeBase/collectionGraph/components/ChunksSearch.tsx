@@ -1,20 +1,20 @@
-import type { FormEvent } from 'react';
 import { useMemo } from 'react';
 import { useNavigate } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
+import get from 'lodash.get';
 import { Loader, Search, X } from 'lucide-react';
-import { useFormContext, ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
 
 import type { IKnowledgeBaseFileListResponse } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { Field } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
+import { useCurrentFormState } from '~/components/form/fields/form.field';
 import { NumberInputField } from '~/components/form/fields/number.field';
 import { SelectField } from '~/components/form/fields/select.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { IconButton } from '~/components/iconButton';
 import { cn } from '~/utils/cn';
+import { useFormContext, ValidatedForm, withZod } from '~/utils/form';
 
 import { ExtendChunksField } from '../../components/ExtendChunksToggleField';
 import { SearchParams } from '../../components/SearchParams';
@@ -38,12 +38,7 @@ export const ChunksSearch = ({ defaultValue, fileList }: ChunksSearchProps) => {
     }));
   }, []);
 
-  const onSubmit = async (
-    values: z.TypeOf<typeof schema>,
-    e: FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
-
+  const onSubmit = async (values: z.TypeOf<typeof schema>) => {
     const url = new URL(window.location.href);
 
     const searchParams = new URLSearchParams(url.search);
@@ -72,7 +67,7 @@ export const ChunksSearch = ({ defaultValue, fileList }: ChunksSearchProps) => {
       <ValidatedForm
         validator={validator}
         defaultValues={{ query: defaultValue.query }}
-        onSubmit={onSubmit}
+        handleSubmit={onSubmit}
         className="flex gap-1 w-full items-start"
       >
         <SearchParams>
@@ -149,12 +144,10 @@ export const ChunksSearch = ({ defaultValue, fileList }: ChunksSearchProps) => {
 };
 
 function ClearButton() {
-  const { getValues } = useFormContext();
+  const { values } = useCurrentFormState();
   const navigate = useNavigate();
 
-  const formData = getValues();
-
-  const query = formData.get('query');
+  const query = get(values, 'query');
 
   return (
     <IconButton
@@ -177,7 +170,9 @@ function ClearButton() {
 }
 
 function SearchButton() {
-  const { isSubmitting } = useFormContext();
+  const {
+    formState: { isSubmitting },
+  } = useFormContext();
 
   return (
     <IconButton

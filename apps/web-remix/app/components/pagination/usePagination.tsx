@@ -6,12 +6,14 @@ export interface Pagination {
   totalItems: number;
   totalPages: number;
   search: string;
+  sort?: string;
 }
 
 export interface PaginationQueryParams {
   page: number;
   per_page: number;
   search: string;
+  sort?: string;
 }
 
 export const DEFAULT_PAGINATION: Pagination = {
@@ -20,6 +22,7 @@ export const DEFAULT_PAGINATION: Pagination = {
   search: '',
   totalItems: 0,
   totalPages: 0,
+  sort: undefined,
 };
 
 export const usePagination = (initialPagination?: Partial<Pagination>) => {
@@ -65,5 +68,6 @@ export function getParamsPagination(params: URLSearchParams) {
     page: Number(params.get('page')) || DEFAULT_PAGINATION.page,
     per_page: Number(params.get('per_page')) || DEFAULT_PAGINATION.per_page,
     search: params.get('search') || DEFAULT_PAGINATION.search,
+    sort: params.get('sort') || DEFAULT_PAGINATION.sort,
   };
 }

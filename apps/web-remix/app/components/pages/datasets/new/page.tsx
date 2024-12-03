@@ -1,9 +1,7 @@
 import React, { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { useFetcher, useLoaderData, useNavigate } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { CircleHelp } from 'lucide-react';
-import { ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
 
 import { CreateDatasetFileUpload } from '~/api/datasets/datasets.contracts';
@@ -29,6 +27,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
@@ -41,12 +40,7 @@ export function NewDataset() {
   const validator = useMemo(() => withZod(CreateDatasetFileUpload), []);
   const fetcher = useFetcher();
 
-  const onSubmit = async (
-    data: z.TypeOf<typeof CreateDatasetFileUpload>,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
-
+  const onSubmit = async (data: z.TypeOf<typeof CreateDatasetFileUpload>) => {
     try {
       if (!data.file || data.file.size === 0) {
         fetcher.submit({ name: data.name }, { method: 'POST' });
@@ -90,7 +84,7 @@ export function NewDataset() {
             method="post"
             noValidate
             className="w-full py-1 flex flex-col gap-4"
-            onSubmit={onSubmit}
+            handleSubmit={onSubmit}
           >
             <div>
               <Field name="name">

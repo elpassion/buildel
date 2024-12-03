@@ -7,14 +7,38 @@ import {
   ExtendedBlockConfig,
   UpdateBlockConfig,
 } from '~/api/blockType/blockType.contracts';
-import type { IInterfaceConfigFormProperty } from '~/components/pages/pipelines/pipeline.types';
+import type {
+  IInterfaceConfigFormOutputProperty,
+  IInterfaceConfigFormProperty,
+  IInterfaceConfigProperty,
+} from '~/components/pages/pipelines/pipeline.types';
 import { PaginationMeta } from '~/components/pagination/pagination.types';
 
-export const InterfaceConfigFormProperty = z.object({
+export const InterfaceConfigProperty = z.object({
   name: z.string(),
   type: z.string(),
 });
-export const InterfaceConfigForm = z.object({
+
+export const InterfaceConfigFormProperty = InterfaceConfigProperty.extend({
+  label: z.string().optional().default(''),
+  description: z.string().optional().default(''),
+  required: z
+    .union([z.boolean(), z.string().transform((v) => v === 'on')])
+    .optional()
+    .default(false),
+});
+
+export const InterfaceConfigFormOutputProperty =
+  InterfaceConfigFormProperty.omit({ required: true });
+
+export const CommonInterfaceConfigForm = z.object({
+  public: z
+    .union([z.boolean(), z.string().transform((v) => v === 'on')])
+    .optional()
+    .default(false),
+});
+
+export const InterfaceFormConfigForm = CommonInterfaceConfigForm.extend({
   inputs: z
     .union([
       z
@@ -32,56 +56,64 @@ export const InterfaceConfigForm = z.object({
         .transform(
           (value) => JSON.parse(value) as IInterfaceConfigFormProperty[],
         ),
-      z.array(InterfaceConfigFormProperty),
+      z.array(InterfaceConfigFormOutputProperty),
     ])
     .default([]),
-  public: z
-    .union([z.boolean(), z.string().transform((v) => v === 'on')])
-    .optional()
-    .default(false),
 });
 
-export const InterfaceWebchatConfigForm = InterfaceConfigForm.extend({
+export const InterfaceWebchatConfigForm = CommonInterfaceConfigForm.extend({
   description: z
     .string()
     .optional()
     .default('Hello. How can I help you today?'),
   suggested_messages: z.array(z.string()).optional().default([]),
+  inputs: z
+    .union([
+      z
+        .string()
+        .transform((value) => JSON.parse(value) as IInterfaceConfigProperty[]),
+      z.array(InterfaceConfigProperty),
+    ])
+    .default([]),
+  outputs: z
+    .union([
+      z
+        .string()
+        .transform((value) => JSON.parse(value) as IInterfaceConfigProperty[]),
+      z.array(InterfaceConfigProperty),
+    ])
+    .default([]),
   audio_inputs: z
     .union([
       z
         .string()
-        .transform(
-          (value) => JSON.parse(value) as IInterfaceConfigFormProperty[],
-        ),
-      z.array(InterfaceConfigFormProperty),
+        .transform((value) => JSON.parse(value) as IInterfaceConfigProperty[]),
+      z.array(InterfaceConfigProperty),
     ])
     .default([]),
   audio_outputs: z
     .union([
       z
         .string()
-        .transform(
-          (value) => JSON.parse(value) as IInterfaceConfigFormProperty[],
-        ),
-      z.array(InterfaceConfigFormProperty),
+        .transform((value) => JSON.parse(value) as IInterfaceConfigProperty[]),
+      z.array(InterfaceConfigProperty),
     ])
     .default([]),
 });
 
 export const InterfaceConfig = z.object({
   webchat: InterfaceWebchatConfigForm.optional().default({
-    inputs: [] as IInterfaceConfigFormProperty[],
-    outputs: [] as IInterfaceConfigFormProperty[],
-    audio_inputs: [] as IInterfaceConfigFormProperty[],
-    audio_outputs: [] as IInterfaceConfigFormProperty[],
+    inputs: [] as IInterfaceConfigProperty[],
+    outputs: [] as IInterfaceConfigProperty[],
+    audio_inputs: [] as IInterfaceConfigProperty[],
+    audio_outputs: [] as IInterfaceConfigProperty[],
     description: 'Hello. How can I help you today?',
     suggested_messages: [] as string[],
     public: false,
   }),
-  form: InterfaceConfigForm.optional().default({
+  form: InterfaceFormConfigForm.optional().default({
     inputs: [] as IInterfaceConfigFormProperty[],
-    outputs: [] as IInterfaceConfigFormProperty[],
+    outputs: [] as IInterfaceConfigFormOutputProperty[],
     public: false,
   }),
 });
@@ -93,34 +125,34 @@ export const SafeInterfaceConfig = z
       ? c
       : {
           webchat: {
-            inputs: [] as IInterfaceConfigFormProperty[],
-            outputs: [] as IInterfaceConfigFormProperty[],
-            audio_outputs: [] as IInterfaceConfigFormProperty[],
-            audio_inputs: [] as IInterfaceConfigFormProperty[],
+            inputs: [] as IInterfaceConfigProperty[],
+            outputs: [] as IInterfaceConfigProperty[],
+            audio_outputs: [] as IInterfaceConfigProperty[],
+            audio_inputs: [] as IInterfaceConfigProperty[],
             description: 'Hello. How can I help you today?',
             suggested_messages: [] as string[],
             public: false,
           },
           form: {
             inputs: [] as IInterfaceConfigFormProperty[],
-            outputs: [] as IInterfaceConfigFormProperty[],
+            outputs: [] as IInterfaceConfigFormOutputProperty[],
             public: false,
           },
         },
   )
   .default({
     webchat: {
-      inputs: [] as IInterfaceConfigFormProperty[],
-      outputs: [] as IInterfaceConfigFormProperty[],
-      audio_outputs: [] as IInterfaceConfigFormProperty[],
-      audio_inputs: [] as IInterfaceConfigFormProperty[],
+      inputs: [] as IInterfaceConfigProperty[],
+      outputs: [] as IInterfaceConfigProperty[],
+      audio_outputs: [] as IInterfaceConfigProperty[],
+      audio_inputs: [] as IInterfaceConfigProperty[],
       description: 'Hello. How can I help you today?',
       suggested_messages: [] as string[],
       public: false,
     },
     form: {
       inputs: [] as IInterfaceConfigFormProperty[],
-      outputs: [] as IInterfaceConfigFormProperty[],
+      outputs: [] as IInterfaceConfigFormOutputProperty[],
       public: false,
     },
   });
