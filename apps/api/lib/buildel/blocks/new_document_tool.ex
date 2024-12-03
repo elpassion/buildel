@@ -1,6 +1,6 @@
 defmodule Buildel.Blocks.NewDocumentTool do
   alias Buildel.Memories.MemoryCollectionSearch
-  alias Buildel.Blocks.DocumentSearch.DocumentSearchJSON
+  alias Buildel.Blocks.DocumentTool.DocumentToolJSON
   alias Buildel.Clients.Utils.Context
 
   use Buildel.Blocks.NewBlock
@@ -38,13 +38,9 @@ defmodule Buildel.Blocks.NewDocumentTool do
     description:
       "Retrieve documents list from knowledge base.",
     schema: %{
-      name: "list",
-      description: "Retrieve documents list from knowledge base.",
-      parameters_schema: %{
-        type: "object",
-        properties: %{},
-        required: []
-      }
+      type: "object",
+      properties: %{},
+      required: []
     }
   )
 
@@ -57,9 +53,6 @@ defmodule Buildel.Blocks.NewDocumentTool do
       "default" => ""
     })
   )
-
-
-
 
   def handle_input(:input, %Message{metadata: %{method: :delete}, message: file} = message, state) do
     send_stream_start(state, :output, message)
@@ -165,81 +158,65 @@ defmodule Buildel.Blocks.NewDocumentTool do
     end
   end
 
-
-
-  @impl true
-  def handle_tool("tool", "documents", {_topic, :text, args, _}, state) do
-#    state = state |> send_stream_start()
-#
-#    %{global: global} =
-#      block_context().context_from_context_id(state[:context_id])
-#
-#    organization = global |> Buildel.Organizations.get_organization!()
-#
-#    try do
-#      memory =
-#        Buildel.Memories.get_collection_memory_by_file_uuid!(
-#          organization,
-#          state[:collection],
-#          args["document_id"]
-#        )
-#
-#      {DocumentToolJSON.show(%{memory: memory}) |> Jason.encode!(), state}
-#    rescue
-#      _ ->
-#        send_error(state, "Failed to retrieve the document")
-#        {"Failed to retrieve document", state}
-#    end
-  end
-
-  @impl true
-  def handle_tool("tool", "list", {_topic, :text, _args, _}, state) do
-#    state = state |> send_stream_start()
-#
-#    %{global: organization_id} = block_context().context_from_context_id(state.context_id)
-#    organization = Buildel.Organizations.get_organization!(organization_id)
-#
-#    {:ok, collection, _collection_name} =
-#      block_context().get_global_collection(state.context_id, state.opts.knowledge)
-#
-#    collection_files =
-#      Buildel.Memories.list_organization_collection_memories(organization, collection)
-#      |> Enum.map(fn memory ->
-#        %{
-#          document_name: memory.file_name,
-#          id: memory.file_uuid
-#        }
-#      end)
-#
-#    {collection_files |> Jason.encode!(), state}
-  end
-
-
   def handle_tool_call(:document, %Message{message: %{args: args}} = message, state) do
     send_stream_start(state, :output, message)
-    IO.inspect(message)
+
+    %{global: organization_id} = Context.context_from_context_id(state.context.context_id)
+
+    organization = organization_id |> Buildel.Organizations.get_organization!()
+
+    try do
+      memory =
+        Buildel.Memories.get_collection_memory_by_file_uuid!(
+          organization,
+          option(state, :knowledge),
+          args["document_id"]
+        )
+      response = message |> Message.from_message() |> Message.set_message(DocumentToolJSON.show(%{memory: memory}) |> Jason.encode!())
+
+      IO.inspect(response)
+
+      output(state, :output, response |> Message.set_type(:text))
+
+      {:ok, response, state}
+    rescue
+      _ ->
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_type(:text)
+          |> Message.set_message("Failed to retrieve the document")
+        )
+
+        send_stream_stop(state, :output, message)
+
+        {:error, "Failed to retrieve document", state}
+    end
   end
 
   def handle_tool_call(:list, %Message{message: %{args: args}} = message, state) do
     send_stream_start(state, :output, message)
-    IO.inspect(message)
-  end
 
-  defp build_call_formatter(value, args) do
-    args
-    |> Enum.reduce(value, fn
-      {key, value}, acc when is_number(value) ->
-        String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+    %{global: organization_id} = Context.context_from_context_id(state.context.context_id)
 
-      {key, value}, acc when is_binary(value) ->
-        String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+    organization = Buildel.Organizations.get_organization!(organization_id)
 
-      {key, value}, acc when is_map(value) ->
-        String.replace(acc, "{{#{key}}}", Jason.encode!(value))
+    {:ok, collection, _collection_name} = memory().get_global_collection(state.context.context_id, option(state, :knowledge))
 
-      _, acc ->
-        acc
-    end)
+    collection_files =
+      Buildel.Memories.list_organization_collection_memories(organization, collection)
+      |> Enum.map(fn memory ->
+        %{
+          document_name: memory.file_name,
+          id: memory.file_uuid
+        }
+      end)
+
+    response = message |> Message.from_message() |> Message.set_message(collection_files |> Jason.encode!())
+
+    output(state, :output, response |> Message.set_type(:text))
+
+    {:ok, response, state}
   end
 end
 
