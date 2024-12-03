@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const IOType = z.object({
-  name: z.string(),
+  name: z.union([z.string(), z.boolean().transform((v) => v.toString())]),
   type: z.enum([
     'audio',
     'text',
