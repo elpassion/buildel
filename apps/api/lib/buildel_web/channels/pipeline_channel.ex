@@ -219,41 +219,11 @@ defmodule BuildelWeb.PipelineChannel do
     }
   end
 
-#  defp process_input(input, data, run) do
-#    [block_name, input_name] = input |> String.split(":")
-#    context_id = Pipelines.Worker.context_id(run)
-#
-#    %{data: data, metadata: metadata} =
-#      case data do
-#        {:binary, content} ->
-#          block_type =
-#            run.interface_config
-#            |> Map.get("inputs", [])
-#            |> Enum.find(%{}, fn input -> Map.get(input, "name") == block_name end)
-#            |> Map.get("type")
-#
-#          if block_type == "file_input" or block_type == "image_input" do
-#            %{metadata: metadata, message: file} = Text.from_binary(content)
-#            {:ok, path} = Temp.path(suffix: metadata |> Map.get("file_name"))
-#            File.write!(path, file)
-#
-#            %{data: {:binary, path}, metadata: metadata}
-#          else
-#            %{data: data, metadata: %{}}
-#          end
-#
-#        _ ->
-#          %{data: {:text, data}, metadata: %{}}
-#      end
-#
-#    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, metadata)
-#  end
-
   defp process_input(input, data, run) do
     [block_name, input_name] = input |> String.split(":")
     context_id = Pipelines.Worker.context_id(run)
 
-    data =
+    %{message: message, metadata: metadata} =
       case data do
         {:binary, content} ->
           block_type =
@@ -262,18 +232,23 @@ defmodule BuildelWeb.PipelineChannel do
             |> Enum.find(%{}, fn input -> Map.get(input, "name") == block_name end)
             |> Map.get("type")
 
-          if block_type == "file_input" do
-            Message.new(:file, content)
+          if block_type == "file_input" or block_type == "image_input" do
+            %{metadata: metadata, message: file} = BinaryMessage.Text.from_binary(content)
+
+            {:ok, path} = Temp.path(suffix: metadata |> Map.get("file_name"))
+
+            File.write!(path, file)
+
+            %{message: Message.new(:binary, path, metadata), metadata: metadata}
           else
-            Message.new(:text, data)
+            %{message: Message.new(:text, data), metadata: %{}}
           end
 
         _ ->
-          Message.new(:text, data)
+          %{message: Message.new(:text, data), metadata: %{}}
       end
-      |> Message.set_sent()
 
-    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, %{})
+    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, message |> Message.set_sent(), metadata)
   end
 
   def handle_info(%Message{} = message, socket) do
@@ -302,7 +277,7 @@ defmodule BuildelWeb.PipelineChannel do
     case interface_output_block_names do
       [] ->
         socket
-        |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
+        |> Phoenix.Channel.push("output:#{}:#{output_name}", message)
 
         {:noreply, socket}
 
@@ -402,8 +377,20 @@ defmodule BuildelWeb.PipelineChannel do
     block_name = message |> Buildel.Blocks.Utils.Message.block_name()
     output_name = message |> Buildel.Blocks.Utils.Message.input_or_output_name()
 
-    socket
-    |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message.message})
+    case message.type do
+      :file ->
+        message = BinaryMessage.Binary.new(message.message, message.metadata)
+        socket
+        |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
+      :binary ->
+        message = BinaryMessage.Binary.new(message.message, message.metadata)
+        socket
+        |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
+
+      _ ->
+        socket
+        |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message.message})
+    end
   end
 
   defp parse_topic(topic) do
