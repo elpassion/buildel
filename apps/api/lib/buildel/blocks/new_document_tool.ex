@@ -1,5 +1,4 @@
 defmodule Buildel.Blocks.NewDocumentTool do
-  alias Buildel.Memories.MemoryCollectionSearch
   alias Buildel.Blocks.DocumentTool.DocumentToolJSON
   alias Buildel.Clients.Utils.Context
 
@@ -194,7 +193,7 @@ defmodule Buildel.Blocks.NewDocumentTool do
     end
   end
 
-  def handle_tool_call(:list, %Message{message: %{args: args}} = message, state) do
+  def handle_tool_call(:list, %Message{} = message, state) do
     send_stream_start(state, :output, message)
 
     %{global: organization_id} = Context.context_from_context_id(state.context.context_id)
