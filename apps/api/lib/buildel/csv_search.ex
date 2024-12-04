@@ -118,12 +118,14 @@ defmodule Buildel.CSVSearch do
   defp generate_create_table_sql(table_name, headers) do
     "CREATE TABLE #{table_name} (__buildel_temporary_id__ INTEGER PRIMARY KEY AUTOINCREMENT, " <>
       Enum.map_join(headers, ", ", fn header ->
-        "#{header} TEXT"
+        "\"#{header}\" TEXT"
       end) <> ")"
   end
 
   defp generate_insert_sql(repo_pid, table_name, row) do
-    columns = get_table_columns(repo_pid, table_name) |> Enum.join(", ")
+    columns = get_table_columns(repo_pid, table_name)
+              |> Enum.map(fn column -> "\"#{column}\"" end)
+              |> Enum.join(", ")
 
     escaped_parameters =
       row
