@@ -697,8 +697,18 @@ defmodule Buildel.Blocks.NewBlock.Server do
         {:ok, stream_state_pid} =
           StreamState.start_link(block.context.block_id, stream_state_state)
 
-        {:ok, server_state |> Map.put(:stream_state_pid, stream_state_pid)}
+        state = server_state |> Map.put(:stream_state_pid, stream_state_pid)
+
+        with {:ok, state} <- setup(state) do
+          {:ok, state}
+        end
       end
+
+      def setup(state) do
+        {:ok, state}
+      end
+
+      defoverridable setup: 1
 
       def handle_info(:started, state) do
         {:ok, state} = handle_start(state)

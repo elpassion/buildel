@@ -2,7 +2,7 @@ defmodule Buildel.Blocks.Utils.Message do
   @enforce_keys [:id, :type, :message, :sent?, :parents]
   defstruct [:id, :type, :message, :topic, :metadata, :sent?, :parents]
 
-  @type type :: :text | :raw | :binary | :json | :file | :tool_call | :tool_response
+  @type type :: :text | :raw | :audio_binary | :binary | :json | :file | :tool_call | :tool_response
   @type t :: %__MODULE__{
           id: String.t(),
           type: type(),

@@ -241,7 +241,7 @@ defmodule BuildelWeb.PipelineChannel do
 
             %{message: Message.new(:binary, path, metadata), metadata: metadata}
           else
-            %{message: Message.new(:text, data), metadata: %{}}
+            %{message: Message.new(:audio_binary, content), metadata: %{}}
           end
 
         _ ->
@@ -386,6 +386,9 @@ defmodule BuildelWeb.PipelineChannel do
         message = BinaryMessage.Binary.new(message.message, message.metadata)
         socket
         |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
+      :audio_binary ->
+        socket
+        |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, message.message})
 
       _ ->
         socket

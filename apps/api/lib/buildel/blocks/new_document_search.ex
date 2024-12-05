@@ -298,8 +298,6 @@ defmodule Buildel.Blocks.NewDocumentSearch do
   defp do_parent(state, nil), do: {:error, :not_found, state}
 
   defp do_parent(state, chunk_id) do
-    IO.inspect(chunk_id)
-
     with {:ok, _collection, collection_name} <-
            memory().get_global_collection(state.context.context_id, option(state, :knowledge)),
          {:ok, vector_db} <-
