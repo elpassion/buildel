@@ -97,9 +97,9 @@
     "parse-domain": "^8.2.2",
     "phoenix": "^1.7.7",
     "rc-select": "14.11.0",
-    "react": "19.0.0-rc-eb3ad065-20240822",
+    "react": "19.0.0",
     "react-datepicker": "^6.6.0",
-    "react-dom": "19.0.0-rc-eb3ad065-20240822",
+    "react-dom": "19.0.0",
     "react-intersection-observer": "^9.5.3",
     "react-markdown": "9.0.1",
     "react-tooltip": "^5.21.5",
@@ -119,9 +119,9 @@
   },
   "pnpm": {
     "overrides": {
-      "react": "19.0.0-rc-eb3ad065-20240822",
-      "react-dom": "19.0.0-rc-eb3ad065-20240822",
-      "react-is": "19.0.0-rc-eb3ad065-20240822",
+      "react": "19.0.0",
+      "react-dom": "19.0.0",
+      "react-is": "19.0.0",
       "micromatch@<4.0.8": ">=4.0.8"
     }
   },
@@ -148,9 +148,9 @@
     "@types/nprogress": "^0.2.3",
     "@types/papaparse": "^5.3.14",
     "@types/phoenix": "^1.6.0",
-    "@types/react": "npm:types-react@19.0.0-rc.0",
+    "@types/react": "19.0.0",
     "@types/react-datepicker": "^6.2.0",
-    "@types/react-dom": "npm:types-react-dom@19.0.0-rc.0",
+    "@types/react-dom": "19.0.0",
     "@types/react-modal": "^3.16.0",
     "@types/source-map-support": "^0.5.7",
     "@types/uuid": "^9.0.3",
