@@ -387,8 +387,9 @@ defmodule BuildelWeb.PipelineChannel do
         socket
         |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
       :audio_binary ->
+        message = BinaryMessage.Binary.new(message.message, message.metadata)
         socket
-        |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, message.message})
+        |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
 
       _ ->
         socket
