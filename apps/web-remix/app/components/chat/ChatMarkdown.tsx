@@ -43,6 +43,8 @@ export const ChatMarkdown: React.FC<ChatMarkdownProps> = ({
         a: Link,
         img: Image,
         strong: Strong,
+        hr: HR,
+        br: BR,
         ...options?.components,
       }}
       {...rest}
@@ -141,7 +143,7 @@ function Paragraph({
 }: React.ParamHTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={cn('my-2 break-words whitespace-pre-wrap text-sm', className)}
+      className={cn('my-2 break-words whitespace-normal text-sm', className)}
       {...rest}
     >
       {children}
@@ -281,6 +283,17 @@ function H1({
       {children}
     </h2>
   );
+}
+
+function HR({
+  className,
+  ...rest
+}: React.ParamHTMLAttributes<HTMLHeadingElement>) {
+  return <hr className={cn('break-words my-2', className)} {...rest} />;
+}
+
+function BR({ className, ...rest }: React.ParamHTMLAttributes<HTMLBRElement>) {
+  return <br className={cn('', className)} {...rest} />;
 }
 
 function Li({
