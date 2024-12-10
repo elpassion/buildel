@@ -5,6 +5,7 @@ import Markdown from 'react-markdown';
 import { Check, Copy } from 'lucide-react';
 import mermaid from 'mermaid';
 import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
 import { z } from 'zod';
 
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
@@ -23,7 +24,7 @@ export const ChatMarkdown: React.FC<ChatMarkdownProps> = ({
 }) => {
   return (
     <Markdown
-      rehypePlugins={[rehypeRaw]}
+      rehypePlugins={[rehypeRaw, remarkGfm]}
       {...options}
       components={{
         style: Span,
