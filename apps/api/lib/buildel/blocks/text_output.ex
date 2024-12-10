@@ -35,7 +35,7 @@ defmodule Buildel.Blocks.TextOutput do
                   "description" =>
                     "Wait this many milliseconds after receiving the last chunk before stopping the stream.",
                   "minimum" => 500,
-                  "default" => 500,
+                  "default" => 5000,
                   "step" => 1
                 },
                 jq_filter:
