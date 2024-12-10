@@ -6,7 +6,7 @@ defmodule Buildel.Blocks.CommentTest do
     test "exposes options" do
       assert Comment.options() == %{
                type: "comment",
-               description: "",
+               description: "Block for adding comments to the workflow",
                inputs: [],
                outputs: [],
                schema: Comment.schema(),
