@@ -4,7 +4,7 @@ defmodule Buildel.Blocks.NewWorkflowCall do
   alias Buildel.Pipelines
   use Buildel.Blocks.NewBlock
 
-  defblock(:workflow_call, description: "", groups: [])
+  defblock(:workflow_call, description: "", groups: ["inputs / outputs"])
 
   defdynamicios()
 
@@ -39,7 +39,8 @@ defmodule Buildel.Blocks.NewWorkflowCall do
         },
         "required" => %{
           "type" => "boolean",
-          "title" => "Required"
+          "title" => "Required",
+          "default" => false
         }
       }
     },
