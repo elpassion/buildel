@@ -63,6 +63,7 @@ defmodule Buildel.Blocks.NewChat do
       "type" => "string",
       "title" => "Endpoint",
       "description" => "The endpoint to use for the chat.",
+      "presentAs" => "resettable-input",
       "defaultWhen" => %{
         "opts.model.api_type" => %{
           "openai" => "https://api.openai.com/v1",

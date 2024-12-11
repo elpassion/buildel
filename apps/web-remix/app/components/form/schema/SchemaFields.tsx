@@ -28,6 +28,7 @@ import {
 import {
   PasswordInputField,
   ResettableTextInputField,
+  TextInputField,
 } from '~/components/form/fields/text.field';
 import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
 import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
@@ -119,12 +120,31 @@ export function StringField({
       }
     }
 
+    if ('presentAs' in field && field.presentAs === 'resettable-input') {
+      return (
+        <FormField name={name}>
+          <ResettableTextInputField
+            id={name}
+            defaultValue={defaultValue}
+            label={field.title}
+            size={size}
+            readOnly={rest.disabled}
+          />
+
+          <FieldMessage size={size} error={error}>
+            {field.description}
+          </FieldMessage>
+        </FormField>
+      );
+    }
+
     return (
       <FormField name={name}>
-        <ResettableTextInputField
+        <FieldLabel size={size}>{field.title}</FieldLabel>
+
+        <TextInputField
           id={name}
           defaultValue={defaultValue}
-          label={field.title}
           size={size}
           readOnly={rest.disabled}
         />

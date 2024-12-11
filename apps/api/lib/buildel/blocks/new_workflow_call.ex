@@ -37,6 +37,16 @@ defmodule Buildel.Blocks.NewWorkflowCall do
           "presentAs" => "async-select",
           "minLength" => 1
         },
+        "description" => %{
+          "type" => "string",
+          "title" => "Description",
+          "default" => "Input used to call workflow"
+        },
+        "title" => %{
+          "type" => "string",
+          "title" => "Title",
+          "default" => ""
+        },
         "required" => %{
           "type" => "boolean",
           "title" => "Required",
@@ -105,12 +115,29 @@ defmodule Buildel.Blocks.NewWorkflowCall do
 
     schema =
       option(state, :inputs)
-      |> Enum.map(
-        &%{
-          required: &1.required,
-          input: Enum.find(inputs, fn io_input -> io_input.name == &1.input_name end)
+      |> Enum.map(fn input_def ->
+        io_input = Enum.find(inputs, fn io_input -> io_input.name == input_def.input_name end)
+        io_input = io_input |> Map.update!(:schema, fn schema ->
+          title = case Map.get(input_def, :title) do
+            nil -> input_def.input_name
+            "" -> input_def.input_name
+            title -> title
+          end
+
+          description = case Map.get(input_def, :description) do
+            nil -> ""
+            description -> description
+          end
+          schema
+          |> Map.put("title", title)
+          |> Map.put("description", description)
+        end)
+
+        %{
+          required: input_def.required,
+          input: io_input
         }
-      )
+      end )
       |> Enum.reduce(%{"properties" => %{}, "required" => [], "type" => "object"}, fn
         %{required: false, input: input}, schema ->
           name = String.replace(input.name, ":", ".")

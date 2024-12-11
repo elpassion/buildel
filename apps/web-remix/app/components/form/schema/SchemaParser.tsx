@@ -234,6 +234,16 @@ export type JSONSchemaField =
       type: 'string';
       title: string;
       description: string;
+      minLength?: number;
+      maxLength?: number;
+      presentAs: 'resettable-input';
+      displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
+    }
+  | {
+      type: 'string';
+      title: string;
+      description: string;
       presentAs: 'wysiwyg';
       displayWhen?: DisplayWhen;
       errorMessages?: Record<string, string>;
