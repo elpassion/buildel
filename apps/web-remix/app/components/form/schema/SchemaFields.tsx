@@ -322,29 +322,37 @@ function RealArrayField({
         })}
       >
         {rhfFields.map((key, _item, index) => (
-          <div key={key} className="relative flex flex-col gap-1">
-            <Field
-              key={key}
-              field={field.items}
-              name={`${name}[${index}]`}
-              fields={fields}
-              schema={schema}
-              {...rest}
-            />
+          <div key={key} className="relative flex gap-2 border p-3 rounded-md">
+            <div className="text-xs bg-muted rounded w-5 h-5 flex justify-center items-center mt-0.5">
+              {index + 1}
+            </div>
 
-            <div className="flex justify-end">
-              <IconButton
-                size="xxs"
-                variant="ghost"
-                className=" bottom-14 right-0"
-                aria-label="Remove field"
-                icon={<Trash />}
-                disabled={rhfFields.length() <= field.minItems || rest.disabled}
-                onClick={(e) => {
-                  e.preventDefault();
-                  rhfFields.remove(index);
-                }}
+            <div className="flex flex-col gap-2 grow">
+              <Field
+                key={key}
+                field={field.items}
+                name={`${name}[${index}]`}
+                fields={fields}
+                schema={schema}
+                {...rest}
               />
+
+              <div className="flex justify-end">
+                <IconButton
+                  size="xxs"
+                  variant="ghost"
+                  className=" bottom-14 right-0"
+                  aria-label="Remove field"
+                  icon={<Trash />}
+                  disabled={
+                    rhfFields.length() <= field.minItems || rest.disabled
+                  }
+                  onClick={(e) => {
+                    e.preventDefault();
+                    rhfFields.remove(index);
+                  }}
+                />
+              </div>
             </div>
           </div>
         ))}
