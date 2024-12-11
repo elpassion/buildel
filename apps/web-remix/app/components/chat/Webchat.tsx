@@ -377,6 +377,7 @@ ${JSON.stringify(files)}
                       [...(e.target.files || [])].forEach((file) => {
                         uploadFileToCorrectInput(file);
                       });
+                      e.target.value = '';
                     }}
                   />
                 </label>

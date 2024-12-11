@@ -87,6 +87,9 @@ export function FileUpload({
                 return file;
               }),
             );
+          })
+          .finally(() => {
+            e.target.value = '';
           });
       });
     },
