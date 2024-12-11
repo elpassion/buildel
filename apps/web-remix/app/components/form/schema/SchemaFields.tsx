@@ -303,19 +303,6 @@ function RealArrayField({
       >
         {rhfFields.map((key, _item, index) => (
           <div key={key} className="relative flex flex-col gap-1">
-            <IconButton
-              size="xxs"
-              variant="ghost"
-              className="absolute bottom-14 right-0"
-              aria-label="Remove field"
-              icon={<Trash />}
-              disabled={rhfFields.length() <= field.minItems || rest.disabled}
-              onClick={(e) => {
-                e.preventDefault();
-                rhfFields.remove(index);
-              }}
-            />
-
             <Field
               key={key}
               field={field.items}
@@ -324,6 +311,21 @@ function RealArrayField({
               schema={schema}
               {...rest}
             />
+
+            <div className="flex justify-end">
+              <IconButton
+                size="xxs"
+                variant="ghost"
+                className=" bottom-14 right-0"
+                aria-label="Remove field"
+                icon={<Trash />}
+                disabled={rhfFields.length() <= field.minItems || rest.disabled}
+                onClick={(e) => {
+                  e.preventDefault();
+                  rhfFields.remove(index);
+                }}
+              />
+            </div>
           </div>
         ))}
       </div>
