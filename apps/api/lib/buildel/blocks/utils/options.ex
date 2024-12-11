@@ -154,7 +154,7 @@ defmodule Buildel.Blocks.Utils.Options do
               field_properties.required
             )
 
-          %{section: %{name: field_section, schema: section_schema}, properties: properties}
+          %{section: %{name: field_section, schema: section_schema, required: section_info[:required]}, properties: properties}
 
         {field_name, %{section: nil} = field_properties},
         %{properties: properties, section: section} ->
@@ -162,13 +162,15 @@ defmodule Buildel.Blocks.Utils.Options do
             section: nil,
             properties:
               properties ++
-                [{section.name, %{schema: section.schema, required: false, section: nil}}] ++
+                [{section.name, %{schema: section.schema, required: section.required, section: nil}}] ++
                 [{field_name, field_properties}]
           }
 
         {field_name, %{section: field_section} = field_properties},
         %{properties: properties, section: %{name: section_name} = section}
         when field_section == section_name ->
+          section_info = options.sections |> Keyword.get(field_section)
+
           section = %{
             section
             | schema:
@@ -177,7 +179,8 @@ defmodule Buildel.Blocks.Utils.Options do
                   field_name,
                   field_properties.schema,
                   field_properties.required
-                )
+                ),
+            required: section_info[:required]
           }
 
           %{section: section, properties: properties}
@@ -202,10 +205,10 @@ defmodule Buildel.Blocks.Utils.Options do
             )
 
           %{
-            section: %{name: field_section, schema: section_schema},
+            section: %{name: field_section, schema: section_schema, required: section_info[:required]},
             properties:
               properties ++
-                [{section.name, %{schema: section.schema, required: false, section: nil}}]
+                [{section.name, %{schema: section.schema, required: section.required, section: nil}}]
           }
       end)
       |> then(fn
@@ -217,7 +220,7 @@ defmodule Buildel.Blocks.Utils.Options do
             section: nil,
             properties:
               properties ++
-                [{section.name, %{schema: section.schema, required: false, section: nil}}]
+                [{section.name, %{schema: section.schema, required: section.required, section: nil}}]
           }
       end)
       |> then(& &1.properties)
