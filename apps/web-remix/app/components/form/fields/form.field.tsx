@@ -40,6 +40,16 @@ export const useCurrentFormState = () => {
     subscribe.value((values) => setValues(values));
   }, []);
 
+  useEffect(() => {
+    if (
+      Object.keys({ ...fieldErrors }).length &&
+      form.formState.submitStatus === 'error' &&
+      process.env.NODE_ENV === 'development'
+    ) {
+      console.log(`Fields validation error:`, { ...fieldErrors });
+    }
+  }, [form.formState.submitStatus]);
+
   return useMemo(() => {
     return { values, subscribe, fieldErrors, getValues: () => values };
   }, [values, subscribe, fieldErrors]);
