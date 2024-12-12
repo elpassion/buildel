@@ -114,7 +114,7 @@ function createMergedContent(contents: string[]) {
 }
 
 function createListItem(content: string) {
-  return `<li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">${content}</span></li>`;
+  return `<li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full break-all"><span class="left-2 relative -top-1.5">${content}</span></li>`;
 }
 
 function hasTextBetween(markdown: string, lastIndex: number, offset: number) {
