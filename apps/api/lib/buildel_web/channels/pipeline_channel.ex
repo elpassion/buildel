@@ -187,9 +187,14 @@ defmodule BuildelWeb.PipelineChannel do
   end
 
   defp send_previous_events(socket) do
+    exposed_blocks = exposed_blocks(socket) |> Enum.map(&Map.get(&1, "name"))
+
     public_outputs =
       socket.assigns.run
       |> Pipelines.blocks_for_run()
+      |> Enum.filter(fn block ->
+        block.name in exposed_blocks
+      end)
       |> Enum.map(fn block ->
         public_outputs =
           block.type.options().outputs |> Enum.filter(fn output -> output.public end)
@@ -202,7 +207,9 @@ defmodule BuildelWeb.PipelineChannel do
       socket.assigns.run
       |> Pipelines.get_pipeline_run_logs()
       |> Enum.map(&log_to_history_event/1)
-      |> Enum.filter(fn event -> {event.block, event.io} in public_outputs end)
+      |> Enum.filter(fn event ->
+        {event.block, event.io} in public_outputs
+      end)
 
     socket |> Phoenix.Channel.push("history", %{events: events})
 
@@ -210,11 +217,17 @@ defmodule BuildelWeb.PipelineChannel do
   end
 
   defp log_to_history_event(%Pipelines.Log{} = log) do
+    output_name =
+      case log.output_name do
+        nil -> nil
+        string when is_binary(string) -> String.to_existing_atom(string)
+      end
+
     %{
       message: log.message,
       type: log.message_type,
       block: log.block_name,
-      io: log.output_name,
+      io: output_name,
       created_at: log.inserted_at
     }
   end
@@ -333,37 +346,26 @@ defmodule BuildelWeb.PipelineChannel do
   end
 
   def handle_info({output_name, :start_stream, _, _metadata}, socket) do
-    case parse_topic(output_name) do
-      %{io: nil, block: block_name} ->
-        socket |> Phoenix.Channel.push("start:#{block_name}", %{})
-
-      _ ->
-        "skip"
-    end
+    if should_send_through_block?(socket, output_name),
+      do: socket |> Phoenix.Channel.push("start:#{parse_topic(output_name).block}", %{})
 
     {:noreply, socket}
   end
 
   def handle_info({output_name, :stop_stream, _, _metadata}, socket) do
-    case parse_topic(output_name) do
-      %{io: nil, block: block_name} ->
-        socket |> Phoenix.Channel.push("stop:#{block_name}", %{})
-
-      _ ->
-        "skip"
-    end
+    if should_send_through_block?(socket, output_name),
+      do: socket |> Phoenix.Channel.push("stop:#{parse_topic(output_name).block}", %{})
 
     {:noreply, socket}
   end
 
   def handle_info({output_name, :error, error, _metadata}, socket) do
-    case parse_topic(output_name) do
-      %{io: nil, block: block_name} ->
-        socket |> Phoenix.Channel.push("error:#{block_name}", %{errors: [error.message]})
-
-      _ ->
-        "skip"
-    end
+    if should_send_through_block?(socket, output_name),
+      do:
+        socket
+        |> Phoenix.Channel.push("error:#{parse_topic(output_name).block}", %{
+          errors: [error.message]
+        })
 
     {:noreply, socket}
   end
@@ -371,17 +373,32 @@ defmodule BuildelWeb.PipelineChannel do
   defp should_send_through_block?(socket, %Message{} = message) do
     block_name = message |> Buildel.Blocks.Utils.Message.block_name()
 
-    run = socket.assigns.run
-
-    interface_output_block_names =
-      (Map.get(run.interface_config, "outputs", []) ++
-         Map.get(run.interface_config, "inputs", []) ++
-         Map.get(run.interface_config, "audio_outputs", []) ++
-         Map.get(run.interface_config, "audio_inputs", []))
-      |> Enum.map(&Map.get(&1, "name"))
+    interface_output_block_names = exposed_blocks(socket) |> Enum.map(&Map.get(&1, "name"))
 
     Enum.member?(interface_output_block_names, block_name) ||
       Enum.count(interface_output_block_names) == 0
+  end
+
+  defp should_send_through_block?(socket, output_name) do
+    interface_output_block_names = exposed_blocks(socket) |> Enum.map(&Map.get(&1, "name"))
+
+    case parse_topic(output_name) do
+      %{io: nil, block: block_name} ->
+        Enum.member?(interface_output_block_names, block_name) ||
+          Enum.count(interface_output_block_names) == 0
+
+      _ ->
+        false
+    end
+  end
+
+  defp exposed_blocks(socket) do
+    run = socket.assigns.run
+
+    Map.get(run.interface_config, "outputs", []) ++
+      Map.get(run.interface_config, "inputs", []) ++
+      Map.get(run.interface_config, "audio_outputs", []) ++
+      Map.get(run.interface_config, "audio_inputs", [])
   end
 
   defp send_message(socket, %Message{} = message) do
