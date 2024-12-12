@@ -187,13 +187,19 @@ defmodule BuildelWeb.PipelineChannel do
   end
 
   defp send_previous_events(socket) do
-    exposed_blocks = exposed_blocks(socket) |> Enum.map(&Map.get(&1, "name"))
+    exposed_blocks = exposed_blocks(socket) |> Enum.map(&Map.get(&1, "name")) |> IO.inspect()
 
     public_outputs =
       socket.assigns.run
       |> Pipelines.blocks_for_run()
-      |> Enum.filter(fn block ->
-        block.name in exposed_blocks
+      |> then(fn blocks ->
+        if exposed_blocks != [] do
+          Enum.filter(blocks, fn block ->
+            block.name in exposed_blocks
+          end)
+        else
+          blocks
+        end
       end)
       |> Enum.map(fn block ->
         public_outputs =
