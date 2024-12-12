@@ -1,5 +1,5 @@
 defmodule Buildel.Blocks.NewDocumentTool do
-  alias Buildel.Blocks.DocumentTool.DocumentToolJSON
+  alias Buildel.Blocks.NewDocumentTool.DocumentToolJSON
   alias Buildel.Clients.Utils.Context
 
   use Buildel.Blocks.NewBlock
@@ -19,8 +19,7 @@ defmodule Buildel.Blocks.NewDocumentTool do
   defoutput(:output, schema: %{})
 
   deftool(:document,
-    description:
-         "Retrieve full document by id.",
+    description: "Retrieve full document by id.",
     schema: %{
       type: "object",
       properties: %{
@@ -34,8 +33,7 @@ defmodule Buildel.Blocks.NewDocumentTool do
   )
 
   deftool(:list,
-    description:
-      "Retrieve documents list from knowledge base.",
+    description: "Retrieve documents list from knowledge base.",
     schema: %{
       type: "object",
       properties: %{},
@@ -63,14 +61,22 @@ defmodule Buildel.Blocks.NewDocumentTool do
       organization = Buildel.Organizations.get_organization!(organization_id)
 
       memory =
-        Buildel.Memories.get_collection_memory_by_file_uuid!(organization, collection_id, file.file_id)
+        Buildel.Memories.get_collection_memory_by_file_uuid!(
+          organization,
+          collection_id,
+          file.file_id
+        )
 
       {:ok, _} =
         Buildel.Memories.delete_organization_memory(organization, collection_id, memory.id)
 
-      output(state, :output, Message.from_message(message)
-                             |> Message.set_message("")
-                             |> Message.set_type(:text))
+      output(
+        state,
+        :output,
+        Message.from_message(message)
+        |> Message.set_message("")
+        |> Message.set_type(:text)
+      )
 
       {:ok, state}
     rescue
@@ -112,10 +118,13 @@ defmodule Buildel.Blocks.NewDocumentTool do
                  file_uuid: file |> Map.get(:file_id)
                }
              ) do
-
-        output(state, :output, Message.from_message(message)
-                               |> Message.set_message(memory.content)
-                               |> Message.set_type(:text))
+        output(
+          state,
+          :output,
+          Message.from_message(message)
+          |> Message.set_message(memory.content)
+          |> Message.set_type(:text)
+        )
 
         {:ok, state}
       else
@@ -130,6 +139,7 @@ defmodule Buildel.Blocks.NewDocumentTool do
           send_stream_stop(state, :output, message)
 
           {:error, reason, state}
+
         _ ->
           message =
             Message.from_message(message)
@@ -171,9 +181,11 @@ defmodule Buildel.Blocks.NewDocumentTool do
           option(state, :knowledge),
           args["document_id"]
         )
-      response = message |> Message.from_message() |> Message.set_message(DocumentToolJSON.show(%{memory: memory}) |> Jason.encode!())
 
-      IO.inspect(response)
+      response =
+        message
+        |> Message.from_message()
+        |> Message.set_message(DocumentToolJSON.show(%{memory: memory}) |> Jason.encode!())
 
       output(state, :output, response |> Message.set_type(:text))
 
@@ -200,7 +212,8 @@ defmodule Buildel.Blocks.NewDocumentTool do
 
     organization = Buildel.Organizations.get_organization!(organization_id)
 
-    {:ok, collection, _collection_name} = memory().get_global_collection(state.context.context_id, option(state, :knowledge))
+    {:ok, collection, _collection_name} =
+      memory().get_global_collection(state.context.context_id, option(state, :knowledge))
 
     collection_files =
       Buildel.Memories.list_organization_collection_memories(organization, collection)
@@ -211,7 +224,10 @@ defmodule Buildel.Blocks.NewDocumentTool do
         }
       end)
 
-    response = message |> Message.from_message() |> Message.set_message(collection_files |> Jason.encode!())
+    response =
+      message
+      |> Message.from_message()
+      |> Message.set_message(collection_files |> Jason.encode!())
 
     output(state, :output, response |> Message.set_type(:text))
 
@@ -219,7 +235,7 @@ defmodule Buildel.Blocks.NewDocumentTool do
   end
 end
 
-defmodule Buildel.Blocks.DocumentTool.DocumentToolJSON do
+defmodule Buildel.Blocks.NewDocumentTool.DocumentToolJSON do
   def show(%{
         memory: memory
       }) do

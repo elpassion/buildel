@@ -1,11 +1,8 @@
 defmodule Buildel.Blocks.NewCSVSearch do
   use Buildel.Blocks.NewBlock
 
-  import Buildel.Blocks.Utils.Schemas
-
   defblock(:csv_search,
-    description:
-      "Used for SQL searching and retrieval of information from CSV files",
+    description: "Used for SQL searching and retrieval of information from CSV files",
     groups: ["tools", "file", "memory"]
   )
 
@@ -13,7 +10,6 @@ defmodule Buildel.Blocks.NewCSVSearch do
   definput(:query, schema: %{})
 
   defoutput(:output, schema: %{})
-
 
   deftool(:query,
     description: "Search the database using valid SQL query",
@@ -34,7 +30,6 @@ defmodule Buildel.Blocks.NewCSVSearch do
          {_, repo_pid} <- repo,
          :ok <- Buildel.CSVSearch.SQLFilter.is_safe_sql(query),
          {:ok, %Exqlite.Result{} = response} <- Buildel.CSVSearch.execute_query(repo_pid, query) do
-
       response = %{rows: response.rows, columns: response.columns}
 
       {:ok, Jason.encode!(response), state}
@@ -60,9 +55,12 @@ defmodule Buildel.Blocks.NewCSVSearch do
       case state[:table_names] do
         nil ->
           "No tables available"
+
         table_names ->
           table_names
-          |> Enum.map(fn {table, columns, _file_id} -> "tableName: #{table} \n tableColumns: #{Enum.join(columns, ", ")}" end)
+          |> Enum.map(fn {table, columns, _file_id} ->
+            "tableName: #{table} \n tableColumns: #{Enum.join(columns, ", ")}"
+          end)
           |> Enum.join("\n\n")
       end
 
@@ -77,15 +75,23 @@ defmodule Buildel.Blocks.NewCSVSearch do
 
     case do_query(state, args["query"]) do
       {:ok, response, state} ->
-        output(state, :output, Message.from_message(message)
-                               |> Message.set_message(response)
-                               |> Message.set_type(:text))
+        output(
+          state,
+          :output,
+          Message.from_message(message)
+          |> Message.set_message(response)
+          |> Message.set_type(:text)
+        )
 
         {:ok, response, state}
+
       {:error, reason, state} ->
-        send_error(state, Message.from_message(message)
-                          |> Message.set_message(reason)
-                          |> Message.set_type(:text))
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_message(reason)
+          |> Message.set_type(:text)
+        )
 
         send_stream_stop(state, :output, reason)
 
@@ -98,15 +104,23 @@ defmodule Buildel.Blocks.NewCSVSearch do
 
     case do_query(state, query) do
       {:ok, response, state} ->
-        output(state, :output, Message.from_message(message)
-                               |> Message.set_message(response)
-                               |> Message.set_type(:text))
+        output(
+          state,
+          :output,
+          Message.from_message(message)
+          |> Message.set_message(response)
+          |> Message.set_type(:text)
+        )
 
         {:ok, state}
+
       {:error, reason, state} ->
-        send_error(state, Message.from_message(message)
-                             |> Message.set_message(reason)
-                             |> Message.set_type(:text))
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_message(reason)
+          |> Message.set_type(:text)
+        )
 
         send_stream_stop(state, :output, reason)
 
@@ -114,8 +128,11 @@ defmodule Buildel.Blocks.NewCSVSearch do
     end
   end
 
-
-  def handle_input(:input, %Message{metadata: %{method: :delete}, message: %{file_id: file_id}} = message, state) do
+  def handle_input(
+        :input,
+        %Message{metadata: %{method: :delete}, message: %{file_id: file_id}} = message,
+        state
+      ) do
     send_stream_start(state, :output, message)
 
     table_name =
@@ -131,9 +148,13 @@ defmodule Buildel.Blocks.NewCSVSearch do
           Enum.reject(table_names, fn {_, _, id} -> id == file_id end)
         end)
 
-      output(state, :output, Message.from_message(message)
-                             |> Message.set_message("")
-                             |> Message.set_type(:text))
+      output(
+        state,
+        :output,
+        Message.from_message(message)
+        |> Message.set_message("")
+        |> Message.set_type(:text)
+      )
 
       {:ok, state}
     else
@@ -148,6 +169,7 @@ defmodule Buildel.Blocks.NewCSVSearch do
         send_stream_stop(state, :output, reason)
 
         {:error, reason, state}
+
       _ ->
         send_error(
           state,
@@ -167,20 +189,23 @@ defmodule Buildel.Blocks.NewCSVSearch do
 
     file_id = Map.get(file, :file_id, UUID.uuid4())
 
-    {state, {repo_name, repo_pid}} = with_repo(state)
+    {state, {_repo_name, repo_pid}} = with_repo(state)
 
     with :ok <- validate_file_type(Map.get(file, :file_type)),
          {:ok, file_content} <- File.read(Map.get(file, :path)),
          {:ok, {table_name, headers}} <- Buildel.CSVSearch.handle_upload(repo_pid, file_content) do
-
       state =
         Map.update(state, :table_names, [{table_name, headers, file_id}], fn table_names ->
           [{table_name, headers, file_id} | table_names]
         end)
 
-      output(state, :output, Message.from_message(message)
-                             |> Message.set_message(table_name)
-                             |> Message.set_type(:text))
+      output(
+        state,
+        :output,
+        Message.from_message(message)
+        |> Message.set_message(table_name)
+        |> Message.set_type(:text)
+      )
 
       {:ok, state}
     else

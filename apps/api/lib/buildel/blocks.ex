@@ -2,7 +2,6 @@ defmodule Buildel.Blocks do
   alias Buildel.Blocks.NewFileInput
   alias Buildel.Blocks.NewBrowserTool
   alias Buildel.Blocks.NewCollect
-  alias Buildel.Blocks.ImageOutput
 
   alias Buildel.Blocks.{
     NewAudioInput,

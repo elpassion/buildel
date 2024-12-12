@@ -56,7 +56,8 @@ defmodule Buildel.Memories do
     end)
   end
 
-  defp maybe_add_search_query(query, %{"search": search_query}) when is_binary(search_query) and search_query != "" do
+  defp maybe_add_search_query(query, %{search: search_query})
+       when is_binary(search_query) and search_query != "" do
     query |> where([m], ilike(m.collection_name, ^"%#{search_query}%"))
   end
 

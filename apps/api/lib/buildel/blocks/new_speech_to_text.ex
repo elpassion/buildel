@@ -1,7 +1,4 @@
 defmodule Buildel.Blocks.NewSpeechToText do
-  alias Buildel.Clients.Utils.Context
-  alias Buildel.Blocks.Utils.ChatMemory
-
   use Buildel.Blocks.NewBlock
 
   import Buildel.Blocks.Utils.Schemas
@@ -48,8 +45,7 @@ defmodule Buildel.Blocks.NewSpeechToText do
     %{
       "type" => "string",
       "title" => "Model",
-      "description" =>
-        "Model allows you to supply a model to use to process submitted audio.",
+      "description" => "Model allows you to supply a model to use to process submitted audio.",
       "enum" => ["base", "enhanced", "nova-2-phonecall"],
       "enumPresentAs" => "radio",
       "default" => "base",
@@ -116,11 +112,11 @@ defmodule Buildel.Blocks.NewSpeechToText do
     {:noreply, state}
   end
 
-  def handle_info({:transcript, %{message: "", is_final: _}} = message, state) do
+  def handle_info({:transcript, %{message: "", is_final: _}} = _message, state) do
     {:noreply, state}
   end
 
-  def handle_info({:transcript, %{message: text}} = message, state) do
+  def handle_info({:transcript, %{message: text}} = _message, state) do
     output(state, :output, Message.new(:text, text))
 
     {:noreply, state}
@@ -139,7 +135,6 @@ defmodule Buildel.Blocks.NewSpeechToText do
 
     {:noreply, state}
   end
-
 
   defp deepgram() do
     Application.fetch_env!(:buildel, :deepgram)
