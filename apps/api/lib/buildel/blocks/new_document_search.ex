@@ -10,7 +10,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
   defblock(:document_search,
     description:
       "Used for efficient searching and retrieval of information from a collection of documents inside Buildel Knowledge Base.",
-    groups: ["file", "memory"]
+    groups: ["tool", "file", "memory"]
   )
 
   definput(:files, schema: %{"type" => "object"}, type: :file, public: true)

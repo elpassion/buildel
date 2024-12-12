@@ -330,7 +330,13 @@ defmodule Buildel.Blocks.NewChat do
                      :output,
                      Message.from_message(message)
                      |> Message.set_type(:text)
-                     |> Message.set_message(tool.call_formatter.(tool_call.arguments)),
+                     |> Message.set_message(
+                       tool.call_formatter.(%{
+                         "args" => tool_call.arguments,
+                         "block_name" => state.block.name,
+                         "tool_name" => tool.name |> String.split("__") |> Enum.at(1)
+                       })
+                     ),
                      stream_stop: :none
                    )
                  end)
@@ -338,14 +344,20 @@ defmodule Buildel.Blocks.NewChat do
                on_tool_content: fn tool_results ->
                  tool_results
                  |> Enum.map(fn tool_result ->
-                  tool = tools |> Enum.find(&(Map.get(&1, :name) == tool_result.name))
+                   tool = tools |> Enum.find(&(Map.get(&1, :name) == tool_result.name))
 
                    output(
                      state,
                      :output,
                      Message.from_message(message)
                      |> Message.set_type(:text)
-                     |> Message.set_message(tool.response_formatter.(%{content: tool_result.content})),
+                     |> Message.set_message(
+                       tool.response_formatter.(%{
+                         "content" => tool_result.content,
+                         "block_name" => state.block.name,
+                         "tool_name" => tool.name |> String.split("__") |> Enum.at(1)
+                       })
+                     ),
                      stream_stop: :none
                    )
                  end)

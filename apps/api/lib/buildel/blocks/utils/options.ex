@@ -69,7 +69,8 @@ defmodule Buildel.Blocks.Utils.Options do
                   title: "Call Formatter",
                   description: "Prompt to display when calling tool",
                   minLength: 1,
-                  default: "abc",
+                  default:
+                    "<details><summary>{{block_name}} {{tool_name}}</summary>Call arguments: {{args}}</details>",
                   suggestions: [],
                   displayWhen: %{
                     connections: %{
@@ -92,7 +93,8 @@ defmodule Buildel.Blocks.Utils.Options do
                   title: "Response Formatter",
                   description: "Prompt to display when tool has responded",
                   minLength: 1,
-                  default: "abc",
+                  default:
+                    "<details><summary>{{block_name}} {{tool_name}}</summary>Result: {{content}}</details>",
                   suggestions: [],
                   displayWhen: %{
                     connections: %{
