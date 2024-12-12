@@ -1,24 +1,23 @@
-defmodule Buildel.Blocks.CommentTest do
+defmodule Buildel.Blocks.NewCommentTest do
   use Buildel.BlockCase, async: true
   alias Blocks.Comment
 
   describe "Comment" do
     test "exposes options" do
-      assert Comment.options() == %{
-               type: "comment",
+      assert  %{
+               type: :comment,
                description: "Block for adding comments to the workflow",
                inputs: [],
                outputs: [],
-               schema: Comment.schema(),
                groups: ["utils"],
                ios: [],
                dynamic_ios: nil
-             }
+             } = Comment.options()
     end
 
     test "validates schema correctly" do
       assert :ok =
-               Blocks.validate_block(Comment, %{"name" => "test", "opts" => %{}, "inputs" => []})
+               Blocks.validate_block(Comment, %{"name": "test", "opts": %{"content": "test", "color": "red"}})
 
       assert {:error, _} = Blocks.validate_block(Comment, %{})
     end
