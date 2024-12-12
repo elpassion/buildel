@@ -8,7 +8,7 @@ defmodule Buildel.Blocks.NewDocumentSearchTest do
       assert %{
                type: :document_search,
                description: "Used for efficient searching and retrieval of information from a collection of documents inside Buildel Knowledge Base.",
-               groups: ["file", "memory"],
+               groups: ["tool", "file", "memory"],
                inputs: [_, _, _],
                outputs: [_],
                ios: [_, _, _],

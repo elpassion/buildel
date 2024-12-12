@@ -129,93 +129,24 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
 
       assert %{
                "inputs" => [
-                 %{
-                   "name" => "random_block:input",
-                   "public" => true,
-                   "type" => "audio",
-                   "visible" => true
-                 },
-                 %{
-                   "name" => "random_block:mute",
-                   "public" => false,
-                   "type" => "text",
-                   "visible" => true
-                 },
-                 %{
-                   "name" => "random_block:unmute",
-                   "public" => false,
-                   "type" => "audio",
-                   "visible" => true
-                 },
-                 %{
-                   "name" => "random_block_2:input",
-                   "public" => false,
-                   "type" => "audio",
-                   "visible" => true
-                 },
-                 %{
-                   "name" => "random_block_3:input",
-                   "public" => false,
-                   "type" => "text",
-                   "visible" => true
-                 },
-                 %{
-                   "name" => "random_block_4:input",
-                   "public" => false,
-                   "type" => "audio",
-                   "visible" => true
-                 }
+                 %{"name" => "random_block:unmute", "public" => false, "type" => "text", "visible" => true, "schema" => %{}},
+                 %{"name" => "random_block:mute", "public" => false, "type" => "text", "visible" => true, "schema" => %{}},
+                 %{"name" => "random_block:input", "public" => true, "type" => "audio", "visible" => true, "schema" => %{}},
+                 %{"name" => "random_block_2:input", "public" => false, "type" => "audio", "visible" => true, "schema" => %{}},
+                 %{"name" => "random_block_3:input", "public" => false, "type" => "text", "visible" => true, "schema" => %{"anyOf" => [%{"type" => "string"}, %{}]}},
+                 %{"name" => "random_block_4:input", "public" => false, "type" => "audio", "visible" => true, "schema" => %{}}
+
                ],
                "ios" => [],
                "outputs" => [
-                 %{
-                   "name" => "random_block:output",
-                   "public" => false,
-                   "type" => "audio",
-                   "visible" => true
-                 },
-                 %{
-                   "name" => "random_block:status",
-                   "public" => true,
-                   "type" => "text",
-                   "visible" => false
-                 },
-                 %{
-                   "name" => "random_block_2:output",
-                   "public" => false,
-                   "type" => "text",
-                   "visible" => true
-                 },
-                 %{
-                   "name" => "random_block_2:json_output",
-                   "public" => false,
-                   "type" => "text",
-                   "visible" => true
-                 },
-                 %{
-                   "name" => "random_block_2:end",
-                   "public" => false,
-                   "type" => "text",
-                   "visible" => true
-                 },
-                 %{
-                   "name" => "random_block_3:output",
-                   "public" => true,
-                   "type" => "text",
-                   "visible" => true
-                 },
-                 %{
-                   "name" => "random_block_3:forward",
-                   "public" => false,
-                   "type" => "text",
-                   "visible" => true
-                 },
-                 %{
-                   "name" => "random_block_4:output",
-                   "public" => true,
-                   "type" => "audio",
-                   "visible" => true
-                 }
+                 %{"name" => "random_block:status", "public" => true, "type" => "text", "visible" => false, "schema" => %{}},
+                 %{"name" => "random_block:output", "public" => false, "type" => "audio", "visible" => true, "schema" => %{}},
+                 %{"name" => "random_block_2:end", "public" => false, "type" => "text", "visible" => true, "schema" => %{}},
+                 %{"name" => "random_block_2:json_output", "public" => false, "type" => "text", "visible" => true, "schema" => %{}},
+                 %{"name" => "random_block_2:output", "public" => false, "schema" => %{}, "type" => "text", "visible" => true},
+                 %{"name" => "random_block_3:forward", "public" => false, "type" => "text", "visible" => true, "schema" => %{"type" => "string"}},
+                 %{"name" => "random_block_3:output", "public" => true, "schema" => %{"type" => "string"}, "type" => "text", "visible" => true},
+                 %{"name" => "random_block_4:output", "public" => true, "type" => "audio", "visible" => true, "schema" => %{}}
                ]
              } = response["data"]
 
