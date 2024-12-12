@@ -248,7 +248,13 @@ defmodule BuildelWeb.PipelineChannel do
           %{message: Message.new(:text, data), metadata: %{}}
       end
 
-    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, message |> Message.set_sent(), metadata)
+    Buildel.BlockPubSub.broadcast_to_io(
+      context_id,
+      block_name,
+      input_name,
+      message |> Message.set_sent(),
+      metadata
+    )
   end
 
   def handle_info(%Message{} = message, socket) do
@@ -365,8 +371,13 @@ defmodule BuildelWeb.PipelineChannel do
   defp should_send_through_block?(socket, %Message{} = message) do
     block_name = message |> Buildel.Blocks.Utils.Message.block_name()
 
+    run = socket.assigns.run
+
     interface_output_block_names =
-      Map.get(socket.assigns.run.interface_config, "outputs", [])
+      (Map.get(run.interface_config, "outputs", []) ++
+         Map.get(run.interface_config, "inputs", []) ++
+         Map.get(run.interface_config, "audio_outputs", []) ++
+         Map.get(run.interface_config, "audio_inputs", []))
       |> Enum.map(&Map.get(&1, "name"))
 
     Enum.member?(interface_output_block_names, block_name) ||
@@ -380,14 +391,19 @@ defmodule BuildelWeb.PipelineChannel do
     case message.type do
       :file ->
         message = BinaryMessage.Binary.new(message.message, message.metadata)
+
         socket
         |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
+
       :binary ->
         message = BinaryMessage.Binary.new(message.message, message.metadata)
+
         socket
         |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
+
       :audio_binary ->
         message = BinaryMessage.Binary.new(message.message, message.metadata)
+
         socket
         |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
 
