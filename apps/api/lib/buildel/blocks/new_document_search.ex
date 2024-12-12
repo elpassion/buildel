@@ -92,7 +92,8 @@ defmodule Buildel.Blocks.NewDocumentSearch do
       "title" => "Memory keywords",
       "description" =>
         "Filter the search to a specific keywords. Ex. [\"keyword1\", \"keyword2\"]"
-    }
+    },
+    required: false
   )
 
   defoption(
@@ -105,7 +106,8 @@ defmodule Buildel.Blocks.NewDocumentSearch do
         "/api/organizations/{{organization_id}}/memory_collections/{{opts.knowledge}}/memories",
       "presentAs" => "async-select",
       "readonly" => true
-    }
+    },
+    required: false
   )
 
   deftool(:query,
