@@ -10,6 +10,8 @@ defmodule Buildel.Blocks.NewTextInput do
   definput(:input, schema: %{"type" => "string"}, public: true)
   definput(:forward, schema: %{"type" => "string"})
 
+  defoutput(:forward, schema: %{"anyOf" => [%{"type" => "string"}, %{}]}, public: true, visible: false)
+
   defoutput(:output, schema: %{"anyOf" => [%{"type" => "string"}, %{}]})
 
   defoption(:output_as, %{
@@ -60,6 +62,7 @@ defmodule Buildel.Blocks.NewTextInput do
   defp handle_message(message, state) do
     case parse_message(message, option(state, :output_as)) do
       %Message{} = message ->
+        output(state, :forward, message)
         output(state, :output, message)
         {:ok, state}
 
