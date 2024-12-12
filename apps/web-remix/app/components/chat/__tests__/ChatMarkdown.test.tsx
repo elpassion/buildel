@@ -201,7 +201,7 @@ describe(ChatMarkdown.name, () => {
             </details>
              
             <p
-              class="my-2 break-words whitespace-pre-wrap text-sm"
+              class="my-2 break-words whitespace-normal text-sm"
               node="[object Object]"
             >
               SOME STRANGE TEXT
@@ -256,7 +256,7 @@ describe(ChatMarkdown.name, () => {
             id="_root"
           >
             <p
-              class="my-2 break-words whitespace-pre-wrap text-sm"
+              class="my-2 break-words whitespace-normal text-sm"
               node="[object Object]"
             >
               SOME STRANGE TEXT
@@ -363,7 +363,7 @@ describe(ChatMarkdown.name, () => {
 
             </details>
             <p
-              class="my-2 break-words whitespace-pre-wrap text-sm"
+              class="my-2 break-words whitespace-normal text-sm"
               node="[object Object]"
             >
               SOME STRANGE TEXT
