@@ -84,11 +84,11 @@ function BlockInputItem({ data, disabled }: IItem) {
     updateInputOptional(data, checked);
     setOptional(checked);
   };
-
+  console.log(data);
   return (
     <div className="relative grid grid-cols-[120px_60px_70px] gap-x-1">
       <p className="text-sm truncate" title={data.from.block_name}>
-        {data.from.block_name}
+        {`${data.from.block_name}:${data.to.input_name}`}
       </p>
       <div className="flex items-center text-sm">
         <CheckboxInput
