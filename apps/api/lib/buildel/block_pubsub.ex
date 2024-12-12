@@ -80,11 +80,24 @@ defmodule Buildel.BlockPubSub do
       "Broadcasting to topic: #{topic}, message: #{inspect(message)}, metadata: #{inspect(metadata)})"
     )
 
+    broadcast_date = NaiveDateTime.utc_now()
+
+    metadata = Map.put(metadata, "_broadcast_date", broadcast_date)
+    message = Message.set_metadata(message, metadata)
+
     Buildel.PubSub
     |> PubSub.broadcast!(
       topic,
       message
     )
+
+    if metadata |> Map.get(:log, true) do
+      Buildel.PubSub
+      |> PubSub.broadcast!(
+        "buildel::logger",
+        {topic, message.type, message.message, metadata, broadcast_date}
+      )
+    end
   end
 
   defp broadcast(_topic, {:workflow_started, _content}, _metadata), do: :ok
@@ -103,11 +116,21 @@ defmodule Buildel.BlockPubSub do
         nil
 
       _ ->
-        Buildel.PubSub
-        |> PubSub.broadcast!(
-          "buildel::logger",
-          {topic, message_type, content, metadata, broadcast_date}
-        )
+        case content do
+          %Message{message: content} ->
+            Buildel.PubSub
+            |> PubSub.broadcast!(
+              "buildel::logger",
+              {topic, message_type, content, metadata, broadcast_date}
+            )
+
+          _ ->
+            Buildel.PubSub
+            |> PubSub.broadcast!(
+              "buildel::logger",
+              {topic, message_type, content, metadata, broadcast_date}
+            )
+        end
     end
 
     metadata = Map.put(metadata, "_broadcast_date", broadcast_date)

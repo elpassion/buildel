@@ -253,7 +253,7 @@ defmodule BuildelWeb.PipelineChannel do
       block_name,
       input_name,
       message |> Message.set_sent(),
-      metadata
+      metadata |> Map.put(:log, false)
     )
   end
 
@@ -408,8 +408,13 @@ defmodule BuildelWeb.PipelineChannel do
         |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
 
       _ ->
+        message = BinaryMessage.Text.new(message.message, message.metadata)
+
         socket
-        |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message.message})
+        |> Phoenix.Channel.push(
+          "output:#{block_name}:#{output_name}",
+          message
+        )
     end
   end
 
