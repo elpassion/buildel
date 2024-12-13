@@ -185,6 +185,7 @@ export const ExtendedPipeline = z.object({
   organization_id: z.number(),
   runs_count: z.number(),
   interface_config: SafeInterfaceConfig,
+  logs_enabled: z.boolean().optional(),
   config: z.object({
     version: z.string(),
     blocks: z.array(ExtendedBlockConfig),

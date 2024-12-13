@@ -12,6 +12,7 @@ import {
   LogBlockName,
   LogDate,
   LogMessage,
+  LogsEmptyMessage,
   LogsLoadMoreWrapper,
   LogsWrapper,
   LogTopic,
@@ -236,6 +237,16 @@ function SidebarLogs({
       clearActiveLogs();
     }
   }, [selectedNode?.id]);
+
+  if (!pipeline.logs_enabled) {
+    return (
+      <LogsEmptyMessage
+        organizationId={pipeline.organization_id}
+        pipelineId={pipeline.id}
+        className="text-xs mt-4"
+      />
+    );
+  }
 
   if (isStarting) {
     return (

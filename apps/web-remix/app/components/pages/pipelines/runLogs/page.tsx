@@ -61,7 +61,7 @@ export function PipelineRunLogs() {
     }));
   }, [pipelineRun.config.blocks]);
 
-  if (pagination.total === 0 && !blockName) {
+  if (pagination.total === 0 && !blockName && !pipeline.logs_enabled) {
     return (
       <LogsEmptyMessage
         organizationId={pipeline.organization_id}
