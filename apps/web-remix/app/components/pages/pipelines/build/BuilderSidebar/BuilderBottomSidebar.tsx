@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useFetcher } from '@remix-run/react';
+import { useStore } from '@xyflow/react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -187,6 +188,10 @@ function SidebarLogs({
   const fetcher = useFetcher<typeof logsLoader>();
   const [key, setKey] = useState(Date.now());
 
+  const selectedNode = useStore((state) =>
+    state.nodes.find((node) => node.selected),
+  );
+
   useEffect(() => {
     if (runId) {
       fetcher.load(
@@ -202,6 +207,35 @@ function SidebarLogs({
       setKey(Date.now());
     }
   }, [fetcher.state, blockName]);
+
+  const clearActiveLogs = () => {
+    const rows = [
+      ...document.querySelectorAll(`[data-logactive="true"]`),
+    ] as HTMLDivElement[];
+
+    rows.forEach((row) => {
+      row.removeAttribute('data-logactive');
+    });
+  };
+
+  const setActiveLogs = (id: string) => {
+    const rows = [
+      ...document.querySelectorAll(`[data-log="${buildLogRowKey(id)}"]`),
+    ] as HTMLDivElement[];
+
+    rows.forEach((row) => {
+      row.setAttribute('data-logactive', 'true');
+    });
+  };
+
+  useEffect(() => {
+    if (selectedNode) {
+      clearActiveLogs();
+      setActiveLogs(selectedNode.id);
+    } else {
+      clearActiveLogs();
+    }
+  }, [selectedNode?.id]);
 
   if (isStarting) {
     return (
@@ -237,7 +271,13 @@ function SidebarLogs({
           <ItemList
             items={logs}
             renderItem={(log) => (
-              <Log log={log} className={cn('py-1')}>
+              <Log
+                log={log}
+                className={cn(
+                  'py-1 data-[logactive=true]:bg-primary/5 data-[logactive=true]:hover:bg-muted',
+                )}
+                data-log={buildLogRowKey(log.block_name)}
+              >
                 <LogDate className="mr-2">{log.created_at}</LogDate>
                 <LogTopic className="mr-2">{log.context}</LogTopic>
                 <LogBlockName className="mr-2">{log.block_name}</LogBlockName>
@@ -266,4 +306,8 @@ function SidebarLogs({
 
 function buildLSKey(organizationId: string) {
   return hashString('builder-bottom-sidebar-' + organizationId).toString();
+}
+
+function buildLogRowKey(blockName: string) {
+  return `${blockName}-log-row`;
 }
