@@ -29,7 +29,8 @@ defmodule Buildel.Clients.NewChat do
         temperature: 0.7,
         max_tokens: nil,
         endpoint: "https://api.openai.com/v1",
-        response_format: "text"
+        response_format: "text",
+        response_schema: nil
       ])
       |> Enum.into(%{})
 
@@ -289,6 +290,7 @@ defmodule Buildel.Clients.NewChat do
       api_key: opts.api_key,
       endpoint: opts.endpoint <> "/chat/completions",
       json_response: opts.response_format == "json",
+      json_schema: opts.response_schema,
       stream_options: %{include_usage: true},
       callbacks: callbacks,
       max_tokens: opts.max_tokens

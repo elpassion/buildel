@@ -153,6 +153,19 @@ defmodule Buildel.Blocks.NewChat do
   })
 
   defoption(
+    :response_schema,
+    EditorField.new(%{
+      title: "Response schema",
+      description: "Enforced schema of response returned from AI model",
+      default: """
+      { "type": "object", "properties": {}, "required": [] }
+      """,
+      suggestions: []
+    }),
+    required: false
+  )
+
+  defoption(
     :system_message,
     EditorField.new(%{
       readonly: true,
@@ -296,6 +309,22 @@ defmodule Buildel.Blocks.NewChat do
       tools = get_connected_tools(state)
       chat_tools = tools |> then(&chat_tool(state, &1))
 
+      response_schema =
+        case option(state, :response_schema) do
+          nil ->
+            nil
+
+          "" ->
+            nil
+
+          response_schema_string ->
+            %{
+              name: state.block.name,
+              schema: Jason.decode!(response_schema_string),
+              strict: true
+            }
+        end
+
       with {:ok, chat_messages, state} <- fill_chat_messages(state),
            {:ok, _, last_message} <-
              chat().stream_chat(
@@ -306,6 +335,7 @@ defmodule Buildel.Blocks.NewChat do
                endpoint: option(state, :endpoint),
                api_type: option(state, :api_type),
                response_format: option(state, :response_format),
+               response_schema: response_schema,
                max_tokens: option(state, :max_tokens),
                tools: chat_tools,
                on_content: fn text_chunk ->
