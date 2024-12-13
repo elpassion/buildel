@@ -16,6 +16,11 @@ import { suggestionHighlighter } from './extensions/suggestionHighlighter';
 
 import './codeMirror.styles.css';
 
+import { AlignLeft } from 'lucide-react';
+
+import { IconButton } from '~/components/iconButton';
+import { cn } from '~/utils/cn';
+
 export type EditorLanguage = 'tsx' | 'json' | 'shell' | 'html' | 'custom';
 
 export interface CodeMirrorProps extends ReactCodeMirrorProps {
@@ -66,20 +71,41 @@ export const CodeMirror: React.FC<CodeMirrorProps> = ({
     return ext;
   }, [suggestions.length, language, wrapLines]);
 
+  const formatCode = () => {
+    if (!value) return;
+    try {
+      const obj = JSON.parse(value);
+      const newValue = JSON.stringify(obj, null, 2);
+      onChange?.(newValue);
+    } catch (error) {}
+  };
+
   return (
-    <ReactCodeMirror
-      ref={editorRef}
-      value={value}
-      onChange={onChange}
-      theme={basicLight}
-      extensions={extensions}
-      basicSetup={{
-        lineNumbers: false,
-        foldGutter: false,
-        indentOnInput: true,
-      }}
-      {...rest}
-    />
+    <div className="relative">
+      <ReactCodeMirror
+        ref={editorRef}
+        value={value}
+        onChange={onChange}
+        theme={basicLight}
+        extensions={extensions}
+        basicSetup={{
+          lineNumbers: false,
+          foldGutter: false,
+          indentOnInput: true,
+        }}
+        {...rest}
+      />
+      {language === 'json' && (
+        <IconButton
+          size="xxs"
+          onlyIcon
+          type="button"
+          onClick={formatCode}
+          icon={<AlignLeft />}
+          className={cn('h-fit absolute bottom-1 right-1 text-black', {})}
+        />
+      )}
+    </div>
   );
 };
 

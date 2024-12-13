@@ -155,12 +155,14 @@ defmodule Buildel.Blocks.NewChat do
   defoption(
     :response_schema,
     EditorField.new(%{
+      readonly: true,
       title: "Response schema",
       description: "Enforced schema of response returned from AI model",
       default: """
       { "type": "object", "properties": {}, "required": [] }
       """,
-      suggestions: []
+      suggestions: [],
+      editor_language: "json"
     }),
     required: false
   )
@@ -321,7 +323,7 @@ defmodule Buildel.Blocks.NewChat do
             %{
               name: state.block.name,
               schema: Jason.decode!(response_schema_string),
-              strict: true
+              strict: false
             }
         end
 
