@@ -4,6 +4,7 @@ import { useFetcher } from '@remix-run/react';
 
 import type { IPipelineRunLog } from '~/api/pipeline/pipeline.contracts';
 import { SelectInput } from '~/components/form/inputs/select/select.input';
+import { SelectInputProps } from '~/components/form/inputs/select/select.input-impl.client';
 import { BasicLink } from '~/components/link/BasicLink';
 import { EmptyMessage } from '~/components/list/ItemList';
 import type { loader } from '~/components/pages/pipelines/runLogs/loader.server';
@@ -145,15 +146,17 @@ export function RunLogsFilter({
   onClear,
   onSelect,
   options,
-}: LogsFilterProps) {
+  ...rest
+}: LogsFilterProps & Partial<SelectInputProps>) {
   return (
     <SelectInput
       allowClear
       onClear={onClear}
-      placeholder="Select block..."
+      placeholder="Filter by block..."
       value={value}
       onSelect={onSelect}
       options={options}
+      {...rest}
     />
   );
 }
