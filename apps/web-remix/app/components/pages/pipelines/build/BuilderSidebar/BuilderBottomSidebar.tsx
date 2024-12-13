@@ -3,15 +3,24 @@ import { useFetcher } from '@remix-run/react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { EmptyMessage } from '~/components/list/ItemList';
+import { EmptyMessage, ItemList } from '~/components/list/ItemList';
 import { PinButton } from '~/components/pages/pipelines/build/BuilderSidebar/BuilderSidebar';
+import { RunLogs } from '~/components/pages/pipelines/components/RunLogs';
 import {
-  RunLogs,
+  Log,
+  LogBlockName,
+  LogDate,
+  LogMessage,
+  LogsLoadMoreWrapper,
+  LogsWrapper,
+  LogTopic,
+  LogTypes,
   RunLogsFilter,
-} from '~/components/pages/pipelines/components/RunLogs';
+} from '~/components/pages/pipelines/components/RunLogs.components';
 import { IExtendedPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { loader as logsLoader } from '~/components/pages/pipelines/runLogs/loader.server';
 import { useRunPipeline } from '~/components/pages/pipelines/RunPipelineProvider';
+import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
 import { useBreakpoints } from '~/hooks/useBreakpoints';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { cn } from '~/utils/cn';
@@ -213,15 +222,44 @@ function SidebarLogs({
   return (
     <RunLogs
       key={key}
-      defaultLogs={fetcher.data?.logs ?? []}
-      defaultAfter={fetcher.data?.pagination.after}
+      blockName={blockName}
       runId={Number(runId)}
       pipelineId={pipeline.id}
-      blockName={blockName}
       organizationId={pipeline.organization_id}
-      className="w-full max-h-[calc(100%_-_45px)] px-2"
-      variant="light"
-      size="sm"
+      defaultLogs={fetcher.data?.logs ?? []}
+      defaultAfter={fetcher.data?.pagination.after}
+      renderLogs={(logs, { status, fetchNext, fetchNextRef, after }) => (
+        <LogsWrapper
+          size="sm"
+          variant="light"
+          className="w-full max-h-[calc(100%_-_45px)] px-2"
+        >
+          <ItemList
+            items={logs}
+            renderItem={(log) => (
+              <Log log={log} className={cn('py-1')}>
+                <LogDate className="mr-2">{log.created_at}</LogDate>
+                <LogTopic className="mr-2">{log.context}</LogTopic>
+                <LogBlockName className="mr-2">{log.block_name}</LogBlockName>
+                <LogMessage className="mr-2" log={log}>
+                  {log.message}
+                </LogMessage>
+                <LogTypes>{log.message_types?.join(' -> ')}</LogTypes>
+              </Log>
+            )}
+          />
+
+          <LogsLoadMoreWrapper ref={fetchNextRef}>
+            <LoadMoreButton
+              className="text-xs"
+              isFetching={status !== 'idle'}
+              disabled={status !== 'idle'}
+              hasNextPage={!!after}
+              onClick={fetchNext}
+            />
+          </LogsLoadMoreWrapper>
+        </LogsWrapper>
+      )}
     />
   );
 }

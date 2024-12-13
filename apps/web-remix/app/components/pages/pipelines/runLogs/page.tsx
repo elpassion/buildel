@@ -1,14 +1,25 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { useLoaderData, useNavigate } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
+import { ItemList } from '~/components/list/ItemList';
+import { RunLogs } from '~/components/pages/pipelines/components/RunLogs';
 import {
+  Log,
+  LogBlockName,
+  LogDate,
+  LogMessage,
   LogsEmptyMessage,
-  RunLogs,
+  LogsLoadMoreWrapper,
+  LogsWrapper,
+  LogTopic,
+  LogTypes,
   RunLogsFilter,
-} from '~/components/pages/pipelines/components/RunLogs';
+} from '~/components/pages/pipelines/components/RunLogs.components';
+import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
 import { Label } from '~/components/ui/label';
+import { cn } from '~/utils/cn';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 import { buildUrlWithParams } from '~/utils/url';
@@ -50,7 +61,7 @@ export function PipelineRunLogs() {
     }));
   }, [pipelineRun.config.blocks]);
 
-  if (pagination.total === 0) {
+  if (pagination.total === 0 && !blockName) {
     return (
       <LogsEmptyMessage
         organizationId={pipeline.organization_id}
@@ -74,11 +85,40 @@ export function PipelineRunLogs() {
 
       <RunLogs
         key={blockName}
-        defaultLogs={logs}
-        defaultAfter={pagination.after}
+        blockName={blockName}
         pipelineId={pipeline.id}
         organizationId={pipeline.organization_id}
         runId={pipelineRun.id}
+        defaultLogs={logs}
+        defaultAfter={pagination.after}
+        renderLogs={(logs, { status, fetchNext, fetchNextRef, after }) => (
+          <LogsWrapper>
+            <ItemList
+              items={logs}
+              renderItem={(log) => (
+                <Log log={log} className={cn('py-1')}>
+                  <LogDate className="mr-2">{log.created_at}</LogDate>
+                  <LogTopic className="mr-2">{log.context}</LogTopic>
+                  <LogBlockName className="mr-2">{log.block_name}</LogBlockName>
+                  <LogMessage className="mr-2" log={log}>
+                    {log.message}
+                  </LogMessage>
+                  <LogTypes>{log.message_types?.join(' -> ')}</LogTypes>
+                </Log>
+              )}
+            />
+
+            <LogsLoadMoreWrapper ref={fetchNextRef}>
+              <LoadMoreButton
+                className="text-xs"
+                isFetching={status !== 'idle'}
+                disabled={status !== 'idle'}
+                hasNextPage={!!after}
+                onClick={fetchNext}
+              />
+            </LogsLoadMoreWrapper>
+          </LogsWrapper>
+        )}
       />
     </PageContentWrapper>
   );
