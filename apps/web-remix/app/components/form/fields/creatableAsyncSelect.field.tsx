@@ -125,7 +125,7 @@ export const CreatableAsyncSelectField = ({
     } catch (e) {
       console.error(e);
 
-      errorToast({ title: 'Error', description: 'Could not create secret' });
+      errorToast({ title: 'Error', description: 'Ups. Something went wrong' });
     }
   };
 
