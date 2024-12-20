@@ -3,8 +3,6 @@ defmodule Buildel.Blocks.NewBraveSearch do
 
   use Buildel.Blocks.NewBlock
 
-  alias Buildel.Blocks.Fields.EditorField
-
   defblock(:brave_search,
     description:
       "Used for searching web using Brave Search.",

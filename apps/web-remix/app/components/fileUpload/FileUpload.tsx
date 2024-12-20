@@ -138,6 +138,7 @@ export function FileUpload({
           size="xs"
           variant="outline"
           className="!text-xs"
+          type="button"
           disabled={disabled}
           isFluid
         >
