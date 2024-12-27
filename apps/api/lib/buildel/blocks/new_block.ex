@@ -642,10 +642,10 @@ defmodule Buildel.Blocks.NewBlock.Deftool do
           args
           |> Enum.reduce(value, fn
             {key, value}, acc when is_number(value) ->
-              String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+              String.replace(acc, "{{#{key}}}", value |> to_string())
 
             {key, value}, acc when is_binary(value) ->
-              String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+              String.replace(acc, "{{#{key}}}", value |> to_string())
 
             {key, value}, acc when is_map(value) ->
               String.replace(acc, "{{#{key}}}", Jason.encode!(value))

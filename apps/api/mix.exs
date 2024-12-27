@@ -65,7 +65,7 @@ defmodule Buildel.MixProject do
       {:erlport, "~>0.11"},
       {:poolboy, "~> 1.5"},
       {:cloak_ecto, "~> 1.2.0"},
-      {:langchain, github: "brainlid/langchain", branch: "main"},
+      {:langchain, github: "brainlid/langchain", sha: "064f7160294f56e5abefec60d45204b2bdf78b05"},
       {:pgvector, "~> 0.3.0"},
       {:dotenv, "~> 3.0.0"},
       {:money, "~> 1.12"},
