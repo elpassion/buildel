@@ -42,7 +42,7 @@ defmodule Buildel.Blocks do
     NewImageOutput,
     Knowledge,
     NewWorkflowCall,
-    CollectAllAudio,
+    NewCollectAllAudio,
     SharepointClient,
     Video
   }
@@ -84,7 +84,7 @@ defmodule Buildel.Blocks do
     "image" => NewImage,
     "image_output" => NewImageOutput,
     "knowledge" => Knowledge,
-    "collect_all_audio" => CollectAllAudio,
+    "collect_all_audio" => NewCollectAllAudio,
     "sharepoint_client" => SharepointClient,
     "video" => Video,
     "code_interpreter" => NewCodeTool
@@ -127,7 +127,7 @@ defmodule Buildel.Blocks do
     NewImage => "image",
     NewImageOutput => "image_output",
     Knowledge => "knowledge",
-    CollectAllAudio => "collect_all_audio",
+    NewCollectAllAudio => "collect_all_audio",
     SharepointClient => "sharepoint_client",
     Video => "video",
     NewCodeTool => "code_interpreter"
