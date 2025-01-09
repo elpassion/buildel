@@ -868,10 +868,10 @@ defmodule Buildel.Blocks.Chat do
         String.replace(acc, "{{#{key}}}", value |> to_string())
 
       {key, value}, acc when is_map(value) ->
-        Jason.encode!(value)
+        String.replace(acc, "{{#{key}}}", Jason.encode!(value))
 
       {key, value}, acc when is_list(value) ->
-        Jason.encode!(value)
+        String.replace(acc, "{{#{key}}}", Jason.encode!(value))
 
       _, acc ->
         acc
