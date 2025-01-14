@@ -83,7 +83,7 @@ defmodule Buildel.BlockPubSub do
     broadcast_date = NaiveDateTime.utc_now()
 
     metadata = Map.put(metadata, "_broadcast_date", broadcast_date)
-    message = Message.set_metadata(message, metadata)
+    message = Message.set_metadata(message, Map.merge(message.metadata, metadata))
 
     Buildel.PubSub
     |> PubSub.broadcast!(

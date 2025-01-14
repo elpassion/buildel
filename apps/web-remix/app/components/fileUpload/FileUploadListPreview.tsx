@@ -96,6 +96,7 @@ export function FileUploadListItem({
       {onRemove && (
         <IconButton
           size="xxxs"
+          type="button"
           icon={
             file.status === 'uploading' ? (
               <Loader
