@@ -128,6 +128,7 @@ export function StringField({
             label={field.title}
             size={size}
             readOnly={rest.disabled}
+            defaultWhen={field.defaultWhen}
           />
 
           <FieldMessage size={size} error={error}>
