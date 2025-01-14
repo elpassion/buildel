@@ -44,3 +44,25 @@ export const useCurrentFormState = () => {
     return { values, subscribe, fieldErrors, getValues: () => values };
   }, [values, subscribe, fieldErrors]);
 };
+
+export function useSubscribeToField(
+  defaultWhen: Record<string, Record<string, string>> | undefined,
+  onUpdate: (value: string) => void,
+) {
+  const { subscribe } = useCurrentFormState();
+
+  useEffect(() => {
+    if (!defaultWhen) return;
+    Object.keys(defaultWhen).forEach((key) => {
+      //eslint-disable-next-line
+      //@ts-ignore
+      subscribe.value(key, (data) => {
+        const value = defaultWhen[key][data];
+
+        if (value) {
+          onUpdate(value);
+        }
+      });
+    });
+  }, [defaultWhen]);
+}

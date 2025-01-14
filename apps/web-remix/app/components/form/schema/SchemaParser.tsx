@@ -228,6 +228,7 @@ export type JSONSchemaField =
       maxLength?: number;
       presentAs: 'password';
       displayWhen?: DisplayWhen;
+      defaultWhen?: Record<string, Record<string, string>>;
       errorMessages?: Record<string, string>;
     }
   | {
@@ -236,6 +237,7 @@ export type JSONSchemaField =
       description: string;
       presentAs: 'wysiwyg';
       displayWhen?: DisplayWhen;
+      defaultWhen?: Record<string, Record<string, string>>;
       errorMessages?: Record<string, string>;
     }
   | {
@@ -250,6 +252,7 @@ export type JSONSchemaField =
       default?: string;
       readonly?: boolean;
       displayWhen?: DisplayWhen;
+      defaultWhen?: Record<string, Record<string, string>>;
       errorMessages?: Record<string, string>;
     }
   | {
@@ -263,6 +266,7 @@ export type JSONSchemaField =
       default?: string;
       readonly?: boolean;
       displayWhen?: DisplayWhen;
+      defaultWhen?: Record<string, Record<string, string>>;
       errorMessages?: Record<string, string>;
     }
   | {
@@ -273,6 +277,7 @@ export type JSONSchemaField =
       url: string;
       default?: string;
       displayWhen?: DisplayWhen;
+      defaultWhen?: Record<string, Record<string, string>>;
       errorMessages?: Record<string, string>;
     }
   | {
@@ -285,6 +290,7 @@ export type JSONSchemaField =
       schema: JSONSchemaField;
       readonly?: boolean;
       displayWhen?: DisplayWhen;
+      defaultWhen?: Record<string, Record<string, string>>;
       errorMessages?: Record<string, string>;
     }
   | {
@@ -297,6 +303,7 @@ export type JSONSchemaField =
       default?: number;
       readonly?: boolean;
       displayWhen?: DisplayWhen;
+      defaultWhen?: Record<string, Record<string, string>>;
       errorMessages?: Record<string, string>;
     }
   | {
@@ -307,6 +314,7 @@ export type JSONSchemaField =
       minItems: number;
       default?: unknown[];
       displayWhen?: DisplayWhen;
+      defaultWhen?: Record<string, Record<string, string>>;
       errorMessages?: Record<string, string>;
     }
   | {
@@ -315,6 +323,7 @@ export type JSONSchemaField =
       description: string;
       default?: boolean;
       displayWhen?: DisplayWhen;
+      defaultWhen?: Record<string, Record<string, string>>;
       errorMessages?: Record<string, string>;
     };
 
