@@ -105,7 +105,16 @@ defmodule Buildel.Blocks.ApiCallTool do
                         }
                       }
                     },
-                    minLength: 1
+                    minLength: 1,
+                    suggestions: [
+                      Suggestion.metadata(),
+                      Suggestion.secrets(),
+                      Suggestion.new(%{
+                        value: "config.args",
+                        description: "Arguments passed to function call."
+                      }),
+                      Suggestion.new(%{value: "config.block_name", description: "Name of the block."})
+                    ]
                   }),
                 authorize: %{
                   "type" => "boolean",
@@ -168,7 +177,13 @@ defmodule Buildel.Blocks.ApiCallTool do
           parameters_schema: state[:parameters]
         },
         call_formatter: fn props ->
-          args = %{"config.args" => props, "config.block_name" => state.block.name}
+          args = state.available_metadata
+                 |> Enum.into(%{}, fn {key, value} -> {"metadata." <> key, value} end)
+                 |> Map.merge(%{
+                  "config.args" => props,
+                  "config.block_name" => state.block.name
+                })
+
           build_call_formatter(state.block.opts.call_formatter, args)
         end,
         response_formatter: fn _response ->
