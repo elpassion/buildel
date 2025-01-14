@@ -26,11 +26,17 @@ export const runLogsReducer = (
 ): RunLogsReducerState => {
   switch (action.type) {
     case 'LOG':
-      return { ...state, logs: [...state.logs, action.payload.data] };
+      return {
+        ...state,
+        logs: uniqueLogs([...state.logs, action.payload.data]),
+      };
     case 'FETCH_OLDER':
       return {
         ...state,
-        logs: [...action.payload.data.slice().reverse(), ...state.logs],
+        logs: uniqueLogs([
+          ...action.payload.data.slice().reverse(),
+          ...state.logs,
+        ]),
         after: action.payload.after,
       };
   }
@@ -54,3 +60,7 @@ export const fetchOlder = (logs: IPipelineRunLog[], after?: string | null) => {
     },
   } as const;
 };
+
+function uniqueLogs(logs: IPipelineRunLog[]) {
+  return [...new Map(logs.map((item) => [item.id, item])).values()];
+}

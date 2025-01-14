@@ -4,7 +4,10 @@ import { RefreshCcw } from 'lucide-react';
 import { useFieldContext } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import type { ValidationBehaviorOptions } from '~/components/form/fields/form.field';
-import { useControlField } from '~/components/form/fields/form.field';
+import {
+  useControlField,
+  useSubscribeToField,
+} from '~/components/form/fields/form.field';
 import type { TextInputProps } from '~/components/form/inputs/text.input';
 import { TextInput } from '~/components/form/inputs/text.input';
 import { IconButton } from '~/components/iconButton';
@@ -59,8 +62,12 @@ export function ResettableTextInputField({
   label,
   defaultValue,
   size,
+  defaultWhen,
   ...props
-}: Partial<TextInputFieldProps> & { label: string }) {
+}: Partial<TextInputFieldProps> & {
+  label: string;
+  defaultWhen?: Record<string, Record<string, string>>;
+}) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { name } = useFieldContext({
     validationBehavior: {
@@ -72,11 +79,13 @@ export function ResettableTextInputField({
 
   const [value, setValue] = useControlField<string | undefined>(name);
 
+  useSubscribeToField(defaultWhen, setValue);
+
   useEffect(() => {
-    if (typeof defaultValue === 'string') {
-      updateAndValidate(defaultValue);
+    if (typeof defaultValue === 'string' && !value) {
+      setValue(defaultValue);
     }
-  }, [defaultValue]);
+  }, []);
 
   const onReset = () => {
     if (typeof defaultValue === 'string') {

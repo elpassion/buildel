@@ -483,6 +483,12 @@ defmodule Buildel.Blocks.Block do
                       "/api/organizations/{{organization_id}}/models/embeddings?api_type={{embeddings.api_type}}",
                     "presentAs" => "async-select"
                   },
+                  "endpoint" => %{
+                    "type" => "string",
+                    "title" => "Endpoint",
+                    "description" => "The endpoint to use for the chat.",
+                    "default" => "https://api.openai.com/v1"
+                  },
                   "secret_name" =>
                     secret_schema(%{
                       "title" => "Embeddings Secret",

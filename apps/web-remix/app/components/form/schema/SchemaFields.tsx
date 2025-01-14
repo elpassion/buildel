@@ -109,7 +109,6 @@ export function StringField({
     //eslint-disable-next-line
     //@ts-ignore
     let defaultValue = field.default;
-
     if ('defaultWhen' in field && field.defaultWhen) {
       const formValues = getValues();
       const defaultKey = Object.keys(field.defaultWhen)[0];
@@ -147,6 +146,7 @@ export function StringField({
           defaultValue={defaultValue}
           size={size}
           readOnly={rest.disabled}
+          defaultWhen={field.defaultWhen}
         />
 
         <FieldMessage size={size} error={error}>

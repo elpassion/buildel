@@ -26,6 +26,7 @@ import {
 } from '~/components/form/schema/SchemaFields';
 import { generateZODSchema } from '~/components/form/schema/SchemaParser';
 import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
+import { errorToast } from '~/components/toasts/errorToast';
 import { successToast } from '~/components/toasts/successToast';
 import {
   DialogDrawer,
@@ -123,6 +124,8 @@ export const CreatableAsyncSelectField = ({
       closeModal();
     } catch (e) {
       console.error(e);
+
+      errorToast({ title: 'Error', description: 'Ups. Something went wrong' });
     }
   };
 
@@ -216,7 +219,7 @@ export function CreatableAsyncForm({
       // @ts-ignore
       validator={validator}
       className="w-full grow flex flex-col space-y-4"
-      onSubmit={onCreate}
+      handleSubmit={onCreate}
       onChange={(e: any) => {
         setLatestValues((prev) => ({ ...prev, [e.target.id]: e.target.value }));
       }}
