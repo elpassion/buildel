@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks.NewBrowserTool do
+  alias Buildel.Blocks.Fields.EditorField
   alias Buildel.Crawler
   use Buildel.Blocks.NewBlock
   use Buildel.Blocks.NewBlock.HttpApi
@@ -14,6 +15,8 @@ defmodule Buildel.Blocks.NewBrowserTool do
     }
   )
 
+  defoutput(:output, schema: %{})
+
   defoption(:host, %{
     type: "string",
     title: "Host",
@@ -23,7 +26,15 @@ defmodule Buildel.Blocks.NewBrowserTool do
     minLength: 1
   })
 
-  defoutput(:output, schema: %{})
+  defoption(:headers, EditorField.new(%{
+    title: "Headers",
+    description:
+      "Valid JSON object of the headers to be sent with the request. i.e. `{\"Content-Type\": \"application/json\"}`.",
+    editorLanguage: "json",
+    default: "{}",
+    minLength: 1,
+    suggestions: []
+  }))
 
   def handle_input(:url, %Message{type: :json, message: message_message} = message, state)
       when is_list(message_message) do
@@ -116,11 +127,14 @@ defmodule Buildel.Blocks.NewBrowserTool do
   defp crawl(state, url) do
     uri = URI.parse(url)
 
+    headers = option(state, :headers) |> Jason.decode!() |> Map.to_list()
+
     with {:ok, crawl} when length(crawl.pages) != 0 <-
            Crawler.crawl(url,
              max_depth: 1,
              url_filter: fn inc_url -> inc_url |> String.contains?(uri.host) end,
-             client: httpApi()
+             client: httpApi(),
+             headers: headers
            ),
          {:ok, path} <- Temp.path(%{suffix: ".md"}),
          :ok <-
@@ -170,13 +184,13 @@ defmodule Buildel.Blocks.NewBrowserTool do
 
   defp does_url_match_host(url, %Regex{} = host) do
     case URI.parse(url) do
-      %URI{} = uri ->
-        if Regex.match?(host, uri.host) do
+      %URI{host: nil} -> {:ok, false}
+      %URI{host: uri_host} ->
+        if Regex.match?(host, uri_host) do
           {:ok, true}
         else
           {:ok, false}
         end
-
       _ ->
         {:ok, false}
     end

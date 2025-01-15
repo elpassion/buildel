@@ -116,8 +116,7 @@ defmodule Buildel.Crawler.Crawl do
     request = %Req.Request{
       url: URI.parse(url),
       method: "GET",
-      headers: headers
-    }
+    } |> Req.Request.put_headers(headers)
 
     case crawl.client.request(request) do
       {:ok, %Req.Response{status: status, body: body}}
