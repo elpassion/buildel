@@ -7,7 +7,7 @@ defmodule Buildel.Blocks.TextToFile do
       type: "text_to_file",
       description: "Used for converting text to a file.",
       groups: ["text"],
-      inputs: [Block.text_input()],
+      inputs: [Block.text_input(), Block.text_input("file_name")],
       outputs: [Block.file_output()],
       ios: [],
       dynamic_ios: nil,
@@ -43,8 +43,10 @@ defmodule Buildel.Blocks.TextToFile do
   @impl true
   def handle_input("input", {_name, :text, text, _metadata}, state) do
     state = send_stream_start(state, "output")
-IO.inspect(state)
-    case convert_text_to_binary(text, %{file_name: state.opts.file_name}) do
+
+    file_name = Map.get(state, :file_name, state.opts.file_name)
+
+    case convert_text_to_binary(text, %{file_name: file_name}) do
       {:ok, metadata} ->
         output(state, "output", {:binary, metadata.file_path}, %{metadata: metadata})
       {:error, reason} ->
@@ -54,6 +56,10 @@ IO.inspect(state)
         send_error(state, "Unknown error")
         state
     end
+  end
+
+  def handle_input("file_name", {_name, :text, text, _metadata}, state) do
+    state |> Map.put(:file_name, text)
   end
 
   defp convert_text_to_binary(text, %{file_name: file_name} = opts) do
