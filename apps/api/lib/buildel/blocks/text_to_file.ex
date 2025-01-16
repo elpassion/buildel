@@ -26,7 +26,15 @@ defmodule Buildel.Blocks.TextToFile do
         "opts" =>
           options_schema(%{
             "required" => [],
-            "properties" => %{}
+            "properties" => %{
+              "file_name" => %{
+                "type" => "string",
+                "title" => "File name",
+                "description" => "Name of the file to save the text to. e.g. 'sample.txt'",
+                "minLength" => 2,
+                "readonly" => true,
+                "default" => "sample.txt"
+              }}
           })
       }
     }
@@ -35,8 +43,8 @@ defmodule Buildel.Blocks.TextToFile do
   @impl true
   def handle_input("input", {_name, :text, text, _metadata}, state) do
     state = send_stream_start(state, "output")
-
-    case convert_text_to_binary(text, %{file_name: "Test.txt"}) do
+IO.inspect(state)
+    case convert_text_to_binary(text, %{file_name: state.opts.file_name}) do
       {:ok, metadata} ->
         output(state, "output", {:binary, metadata.file_path}, %{metadata: metadata})
       {:error, reason} ->
@@ -67,6 +75,9 @@ defmodule Buildel.Blocks.TextToFile do
   end
 
   defp validate_file_name(file_name) do
-    :ok
+    case Path.extname(file_name) do
+      "" -> {:error, "File name must have a extension"}
+      _ -> :ok
+    end
   end
 end
