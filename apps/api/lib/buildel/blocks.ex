@@ -43,7 +43,8 @@ defmodule Buildel.Blocks do
     Knowledge,
     CollectAllAudio,
     SharepointClient,
-    Video
+    Video,
+    TextToFile
   }
 
   @names_to_blocks_map %{
@@ -85,7 +86,8 @@ defmodule Buildel.Blocks do
     "knowledge" => Knowledge,
     "collect_all_audio" => CollectAllAudio,
     "sharepoint_client" => SharepointClient,
-    "video" => Video
+    "video" => Video,
+    "text_to_file" => TextToFile
   }
 
   @blocks_to_names_map %{
@@ -127,7 +129,8 @@ defmodule Buildel.Blocks do
     Knowledge => "knowledge",
     CollectAllAudio => "collect_all_audio",
     SharepointClient => "sharepoint_client",
-    Video => "video"
+    Video => "video",
+    TextToFile => "text_to_file"
   }
 
   def list_types() do
