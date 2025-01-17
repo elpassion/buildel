@@ -36,6 +36,21 @@ defmodule Buildel.Blocks.NewBrowserTool do
     suggestions: []
   }))
 
+  deftool(:url,
+    description: "Browse a website and extract information.",
+    schema: %{
+      type: "object",
+      properties: %{
+        url: %{
+          type: "string",
+          description:
+            "The URL to browse. Pass full URL including protocol like https://url.com"
+        }
+      },
+      required: ["url"]
+    }
+  )
+
   def handle_input(:url, %Message{type: :json, message: message_message} = message, state)
       when is_list(message_message) do
     send_stream_start(state, :output, message)
@@ -99,6 +114,47 @@ defmodule Buildel.Blocks.NewBrowserTool do
 
         send_stream_stop(state, :output, message)
         {:error, "URL #{message.message} does not match host #{option(state, :host)}", state}
+
+      {:error, reason, state} ->
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_type(:text)
+          |> Message.set_message(reason)
+        )
+
+        send_stream_stop(state, :output, message)
+        {:error, reason, state}
+    end
+  end
+
+
+  def handle_tool_call(:url, %Message{message: %{args: args}} = message, state) do
+    send_stream_start(state, :output, message)
+
+    with {:ok, true} <- does_url_match_host(String.trim(args["url"], "\""), Regex.compile!(option(state, :host))),
+         {:ok, response, state} <- visit_url(state, args["url"]) do
+
+      response = message |> Message.set_type(:text) |> Message.set_message(response)
+
+      output(
+        state,
+        :output,
+        response
+      )
+
+      {:ok, response, state}
+    else
+      {:ok, false} ->
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_type(:text)
+          |> Message.set_message("URL #{args.url} does not match host #{option(state, :host)}")
+        )
+
+        send_stream_stop(state, :output, message)
+        {:error, "URL #{args.url} does not match host #{option(state, :host)}", state}
 
       {:error, reason, state} ->
         send_error(
@@ -183,6 +239,7 @@ defmodule Buildel.Blocks.NewBrowserTool do
   end
 
   defp does_url_match_host(url, %Regex{} = host) do
+    IO.inspect(url, label: "url")
     case URI.parse(url) do
       %URI{host: nil} -> {:ok, false}
       %URI{host: uri_host} ->
