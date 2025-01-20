@@ -31,6 +31,23 @@ defmodule Buildel.Blocks.NewApiCallTool do
     readonly: true
   })
 
+  defoption(:description, %{
+    type: "string",
+    title: "Description",
+    description:
+      "The description of the API call.",
+    default: "Tool to call HTTP APIs.",
+    displayWhen: %{
+      connections: %{
+        tool_worker: %{
+          min: 1
+        }
+      }
+    },
+    minLength: 1,
+    readonly: true
+  })
+
   defoption(
     :parameters,
     EditorField.new(%{
@@ -60,6 +77,7 @@ defmodule Buildel.Blocks.NewApiCallTool do
       ]
     })
   )
+
 
   def handle_input(:args, %Message{type: :json, message: message_message} = message, state)
       when is_list(message_message) do
@@ -118,22 +136,25 @@ defmodule Buildel.Blocks.NewApiCallTool do
     end
   end
 
+
   defp call_api(state, args) do
     with {:ok, url} <- build_url(option(state, :url), args),
          {:ok, headers} <- build_headers(option(state, :headers), args),
-         {:ok, response} <- request(option(state, :method), url, headers) do
+         {:ok, body} <- build_body("{}", args),
+         {:ok, response} <- request(option(state, :method), url, headers, body) do
       {:ok, response}
     else
       error -> error
     end
   end
 
-  defp request(method, url, headers) do
+  defp request(method, url, headers, body \\ %{} ) do
     request =
       Req.new(
         method: method,
         url: url,
-        headers: headers
+        headers: headers,
+        body: Jason.encode!(body)
       )
 
     case httpApi().request(request) do
@@ -165,9 +186,21 @@ defmodule Buildel.Blocks.NewApiCallTool do
      end)}
   end
 
-  defp build_headers(headers_template, _args) do
-    with {:ok, headers} <- Jason.decode(headers_template) do
-      {:ok, headers}
+  defp build_headers(headers_template, args) do
+    with {:ok, args_headers} <- validate_args_headers(Map.get(args, "headers", %{})),
+         {:ok, headers} <- Jason.decode(headers_template) do
+
+      {:ok, headers |> Map.merge(args_headers)}
+    else
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp build_body(body_template, args) do
+    with {:ok, args_body} <- validate_args_body(Map.get(args, "body", %{})),
+         {:ok, body} <- Jason.decode(body_template) do
+
+      {:ok, body |> Map.merge(args_body)}
     else
       {:error, reason} -> {:error, reason}
     end
@@ -179,5 +212,21 @@ defmodule Buildel.Blocks.NewApiCallTool do
       "https" -> {:ok, "https"}
       _ -> {:error, "Invalid schema"}
     end
+  end
+
+  defp validate_args_headers(headers) when is_map(headers) do
+    {:ok, headers}
+  end
+
+  defp validate_args_headers(headers) do
+    {:error, "Invalid headers"}
+  end
+
+  defp validate_args_body(body) when is_map(body) do
+    {:ok, body}
+  end
+
+  defp validate_args_body(body) do
+    {:error, "Invalid body"}
   end
 end
