@@ -194,23 +194,8 @@ defmodule Buildel.Blocks.NewApiCallTool do
     tool = @tools |> Enum.find(&(&1.name == :request))
 
     description = option(state, :description)
-    body = Jason.decode!(option(state, :body))
-    headers = Jason.decode!(option(state, :headers))
-    params = Jason.decode!(option(state, :params))
-    searchParams = Jason.decode!(option(state, :searchParams))
 
-    mergedSchema = %{
-      type: "object",
-      properties: %{
-        body: body,
-        headers: headers,
-        params: params,
-        searchParams: searchParams
-      },
-      required: ["body", "headers", "params", "searchParams"]
-    }
-
-    tool = tool |> Map.put(:description, description) |> Map.put(:schema, mergedSchema)
+    tool = tool |> Map.put(:description, description) |> Map.put(:schema, merge_schemas(state))
   end
 
   defp call_api(state, args) do
@@ -342,7 +327,7 @@ defmodule Buildel.Blocks.NewApiCallTool do
     {:error, "Invalid search params"}
   end
 
-  def flatten_map(map) do
+  defp flatten_map(map) do
     do_flatten_map(map, %{})
   end
 
@@ -356,4 +341,36 @@ defmodule Buildel.Blocks.NewApiCallTool do
       end
     end)
   end
+
+  defp merge_schemas(state) do
+    properties = %{
+      body: Jason.decode!(option(state, :body)),
+      headers: Jason.decode!(option(state, :headers)),
+      params: Jason.decode!(option(state, :params)),
+      searchParams: Jason.decode!(option(state, :searchParams))
+    }
+
+    %{
+      type: "object",
+      properties: properties,
+      required: determine_required(properties)
+    }
+  end
+
+  defp determine_required(properties) do
+    properties
+    |> Enum.filter(fn {_key, value} ->
+      contains_required?(value)
+    end)
+    |> Enum.map(fn {key, _value} -> to_string(key) end)
+  end
+
+  defp contains_required?(%{"required" => required_list}) when is_list(required_list) and length(required_list) > 0, do: true
+
+  defp contains_required?(%{"properties" => properties}) when is_map(properties) do
+    properties
+    |> Enum.any?(fn {_key, value} -> contains_required?(value) end)
+  end
+
+  defp contains_required?(_), do: false
 end
