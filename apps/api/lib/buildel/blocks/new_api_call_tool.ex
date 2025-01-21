@@ -49,15 +49,14 @@ defmodule Buildel.Blocks.NewApiCallTool do
   })
 
   defoption(
-    :parameters,
+    :body,
     EditorField.new(%{
-      title: "Parameters",
+      title: "Body",
       description:
-        "Valid JSONSchema definition of the parameters passed to api call. Always pass a JSON object schema. i.e. `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}`.",
+        "Valid JSONSchema definition of the body passed to api call. Always pass a JSON object schema. i.e. `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}`.",
       editorLanguage: "json",
       default: "{\"type\": \"object\", \"properties\": {}, \"required\": []}",
-      minLength: 1,
-      readonly: true
+      minLength: 1
     })
   )
 
@@ -66,18 +65,47 @@ defmodule Buildel.Blocks.NewApiCallTool do
     EditorField.new(%{
       title: "Headers",
       description:
-        "Valid JSON object of the headers to be sent with the request. i.e. `{\"Content-Type\": \"application/json\"}`.",
+        "Valid JSONSchema definition of the headers passed to api call. Always pass a JSON object schema. i.e. `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}`.",
       editorLanguage: "json",
-      default: "{\"Content-Type\": \"application/json\", \"Accept\": \"application/json\"}",
-      minLength: 1,
-      suggestions: [
-        Suggestion.inputs(),
-        Suggestion.metadata(),
-        Suggestion.secrets()
-      ]
+      default: "{\"type\": \"object\", \"properties\": {}, \"required\": []}",
+      minLength: 1
     })
   )
 
+  defoption(
+    :params,
+    EditorField.new(%{
+      title: "Params",
+      description:
+        "Valid JSONSchema definition of the parameters passed to api call. Always pass a JSON object schema. i.e. `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}`.",
+      editorLanguage: "json",
+      default: "{\"type\": \"object\", \"properties\": {}, \"required\": []}",
+      minLength: 1
+    })
+  )
+
+  defoption(
+    :searchParams,
+    EditorField.new(%{
+      title: "Search Params",
+      description:
+        "Valid JSONSchema definition of the search params passed to api call. Always pass a JSON object schema. i.e. `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}`.",
+      editorLanguage: "json",
+      default: "{\"type\": \"object\", \"properties\": {}, \"required\": []}",
+      minLength: 1
+    })
+  )
+
+  deftool(:request,
+    description: "Make an API request.",
+    schema: %{
+      type: "object",
+      properties: %{
+
+      },
+      required: []
+    }
+  )
 
   def handle_input(:args, %Message{type: :json, message: message_message} = message, state)
       when is_list(message_message) do
@@ -137,10 +165,60 @@ defmodule Buildel.Blocks.NewApiCallTool do
   end
 
 
+  def handle_tool_call(:request, %Message{message: %{args: args}} = message, state) do
+    send_stream_start(state, :output, message)
+
+    with {:ok, response} <- call_api(state, args) do
+      output(
+        state,
+        :output,
+        message
+        |> Message.from_message()
+        |> Message.set_type(:json)
+        |> Message.set_message(response)
+      )
+
+      {:ok, response, state}
+    else
+      {:error, reason} ->
+        send_error(
+          state,
+          Message.from_message(message) |> Message.set_type(:text) |> Message.set_message(reason)
+        )
+
+        {:error, reason, state}
+    end
+  end
+
+  def handle_get_tool(:request, state) do
+    tool = @tools |> Enum.find(&(&1.name == :request))
+
+    description = option(state, :description)
+    body = Jason.decode!(option(state, :body))
+    headers = Jason.decode!(option(state, :headers))
+    params = Jason.decode!(option(state, :params))
+    searchParams = Jason.decode!(option(state, :searchParams))
+
+    mergedSchema = %{
+      type: "object",
+      properties: %{
+        body: body,
+        headers: headers,
+        params: params,
+        searchParams: searchParams
+      },
+      required: ["body", "headers", "params", "searchParams"]
+    }
+
+    tool = tool |> Map.put(:description, description) |> Map.put(:schema, mergedSchema)
+  end
+
   defp call_api(state, args) do
-    with {:ok, url} <- build_url(option(state, :url), args),
-         {:ok, headers} <- build_headers(option(state, :headers), args),
+    with {:ok, params} <- build_params("{}", args),
+         {:ok, searchParams} <- build_search_params("{}", args),
          {:ok, body} <- build_body("{}", args),
+         {:ok, headers} <- build_headers("{}", args),
+         {:ok, url} <- build_url(option(state, :url), %{params: params, body: body, headers: headers, searchParams: searchParams}),
          {:ok, response} <- request(option(state, :method), url, headers, body) do
       {:ok, response}
     else
@@ -167,7 +245,7 @@ defmodule Buildel.Blocks.NewApiCallTool do
   end
 
   defp build_url(url_template, args) do
-    with {:ok, url} <- fill_url(url_template, args),
+    with {:ok, url} <- fill_url(url_template, flatten_map(args)),
          {:ok, uri} <- URI.new(url),
          {:ok, _} <- validate_scheme(uri.scheme) do
       {:ok, url}
@@ -196,6 +274,24 @@ defmodule Buildel.Blocks.NewApiCallTool do
     end
   end
 
+  defp build_params(params_template, args) do
+    with {:ok, args_params} <- validate_args_params(Map.get(args, "params", %{})),
+         {:ok, params} <- Jason.decode(params_template) do
+      {:ok, params |> Map.merge(args_params)}
+    else
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp build_search_params(params_template, args) do
+    with {:ok, args_params} <- validate_args_search_params(Map.get(args, "searchParams", %{})),
+         {:ok, params} <- Jason.decode(params_template) do
+      {:ok, params |> Map.merge(args_params)}
+    else
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
   defp build_body(body_template, args) do
     with {:ok, args_body} <- validate_args_body(Map.get(args, "body", %{})),
          {:ok, body} <- Jason.decode(body_template) do
@@ -218,7 +314,7 @@ defmodule Buildel.Blocks.NewApiCallTool do
     {:ok, headers}
   end
 
-  defp validate_args_headers(headers) do
+  defp validate_args_headers(_) do
     {:error, "Invalid headers"}
   end
 
@@ -226,7 +322,38 @@ defmodule Buildel.Blocks.NewApiCallTool do
     {:ok, body}
   end
 
-  defp validate_args_body(body) do
+  defp validate_args_body(_) do
     {:error, "Invalid body"}
+  end
+
+  defp validate_args_params(params) when is_map(params) do
+    {:ok, params}
+  end
+
+  defp validate_args_params(_) do
+    {:error, "Invalid params"}
+  end
+
+  defp validate_args_search_params(params) when is_map(params) do
+    {:ok, params}
+  end
+
+  defp validate_args_search_params(_) do
+    {:error, "Invalid search params"}
+  end
+
+  def flatten_map(map) do
+    do_flatten_map(map, %{})
+  end
+
+  defp do_flatten_map(%{} = map, acc, parent_key \\ "") do
+    Enum.reduce(map, acc, fn {key, value}, acc ->
+      full_key = if parent_key == "", do: "#{key}", else: "#{parent_key}.#{key}"
+
+      case value do
+        %{} -> do_flatten_map(value, acc, full_key)
+        _ -> Map.put(acc, full_key, value)
+      end
+    end)
   end
 end
