@@ -95,6 +95,12 @@ defmodule Buildel.Blocks.BraveSearch do
      )}
   end
 
+  defp search(query, state) when query in ["\"\"", nil, %{}] do
+    send_error(state, "query is missing")
+
+    {"query is missing", state}
+  end
+
   defp search(query, state) do
     state = send_stream_start(state)
 
