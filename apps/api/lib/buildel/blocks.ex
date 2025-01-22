@@ -44,7 +44,8 @@ defmodule Buildel.Blocks do
     NewWorkflowCall,
     NewCollectAllAudio,
     SharepointClient,
-    Video
+    Video,
+    TextToFile
   }
 
   @names_to_blocks_map %{
@@ -87,7 +88,8 @@ defmodule Buildel.Blocks do
     "collect_all_audio" => NewCollectAllAudio,
     "sharepoint_client" => SharepointClient,
     "video" => Video,
-    "code_interpreter" => NewCodeTool
+    "code_interpreter" => NewCodeTool,
+    "text_to_file" => TextToFile
   }
 
   @blocks_to_names_map %{
@@ -130,7 +132,8 @@ defmodule Buildel.Blocks do
     NewCollectAllAudio => "collect_all_audio",
     SharepointClient => "sharepoint_client",
     Video => "video",
-    NewCodeTool => "code_interpreter"
+    NewCodeTool => "code_interpreter",
+    TextToFile => "text_to_file"
   }
 
   def list_types() do
