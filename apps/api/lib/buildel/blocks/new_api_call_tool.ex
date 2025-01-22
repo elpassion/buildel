@@ -1,9 +1,10 @@
 defmodule Buildel.Blocks.NewApiCallTool do
   alias Buildel.Blocks.Fields.EditorField
   alias EditorField.Suggestion
+  alias Buildel.Blocks.Utils.Injectable
+  alias Buildel.FlattenMap
   use Buildel.Blocks.NewBlock
   use Buildel.Blocks.NewBlock.HttpApi
-  alias Buildel.FlattenMap
 
   defblock(:api_call_tool,
     description: "Tool used to call HTTP APIs.",
@@ -40,7 +41,7 @@ defmodule Buildel.Blocks.NewApiCallTool do
     default: "Tool to call HTTP APIs.",
     displayWhen: %{
       connections: %{
-        tool_worker: %{
+        request_worker: %{
           min: 1
         }
       }
@@ -57,7 +58,14 @@ defmodule Buildel.Blocks.NewApiCallTool do
         "Valid JSONSchema definition of the body passed to api call. Always pass a JSON object schema. i.e. `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}`.",
       editorLanguage: "json",
       default: "{\"type\": \"object\", \"properties\": {}, \"required\": []}",
-      minLength: 1
+      minLength: 1,
+      displayWhen: %{
+        connections: %{
+          request_worker: %{
+            min: 1
+          }
+        }
+      },
     })
   )
 
@@ -69,7 +77,14 @@ defmodule Buildel.Blocks.NewApiCallTool do
         "Valid JSONSchema definition of the headers passed to api call. Always pass a JSON object schema. i.e. `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}`.",
       editorLanguage: "json",
       default: "{\"type\": \"object\", \"properties\": {}, \"required\": []}",
-      minLength: 1
+      minLength: 1,
+      displayWhen: %{
+        connections: %{
+          request_worker: %{
+            min: 1
+          }
+        }
+      },
     })
   )
 
@@ -81,7 +96,14 @@ defmodule Buildel.Blocks.NewApiCallTool do
         "Valid JSONSchema definition of the parameters passed to api call. Always pass a JSON object schema. i.e. `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}`.",
       editorLanguage: "json",
       default: "{\"type\": \"object\", \"properties\": {}, \"required\": []}",
-      minLength: 1
+      minLength: 1,
+      displayWhen: %{
+        connections: %{
+          request_worker: %{
+            min: 1
+          }
+        }
+      },
     })
   )
 
@@ -93,7 +115,14 @@ defmodule Buildel.Blocks.NewApiCallTool do
         "Valid JSONSchema definition of the search params passed to api call. Always pass a JSON object schema. i.e. `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}`.",
       editorLanguage: "json",
       default: "{\"type\": \"object\", \"properties\": {}, \"required\": []}",
-      minLength: 1
+      minLength: 1,
+      displayWhen: %{
+        connections: %{
+          request_worker: %{
+            min: 1
+          }
+        }
+      },
     })
   )
 
@@ -107,6 +136,27 @@ defmodule Buildel.Blocks.NewApiCallTool do
       required: []
     }
   )
+
+  def setup(state) do
+    flattened_metadata =
+      FlattenMap.flatten(state.block.opts.metadata)
+
+    available_metadata = Injectable.used_metadata_keys(option(state, :url))
+                         |> Enum.reduce(%{}, fn key, acc ->
+      acc
+      |> Map.put(key, flattened_metadata[key])
+    end)
+
+    available_secrets =  Injectable.used_secrets_keys(option(state, :url))
+                          |> Enum.reduce(%{}, fn secret, acc ->
+      acc
+      |> Map.put(secret, secret(state, secret))
+    end)
+
+    state = state |> Map.put(:available_metadata, available_metadata) |> Map.put(:available_secrets, available_secrets)
+
+    {:ok, state}
+  end
 
   def handle_input(:args, %Message{type: :json, message: message_message} = message, state)
       when is_list(message_message) do
@@ -195,7 +245,7 @@ defmodule Buildel.Blocks.NewApiCallTool do
     tool = @tools |> Enum.find(&(&1.name == :request))
 
     description = option(state, :description)
-IO.inspect(merge_schemas(state), label: "merge_schemas")
+
     tool = tool |> Map.put(:description, description) |> Map.put(:schema, merge_schemas(state))
   end
 
@@ -204,7 +254,7 @@ IO.inspect(merge_schemas(state), label: "merge_schemas")
          {:ok, searchParams} <- build_search_params("{}", args),
          {:ok, body} <- build_body("{}", args),
          {:ok, headers} <- build_headers("{}", args),
-         {:ok, url} <- build_url(option(state, :url), %{params: params, body: body, headers: headers, searchParams: searchParams}),
+         {:ok, url} <- build_url(option(state, :url), %{params: params, body: body, headers: headers, searchParams: searchParams, metadata: state.available_metadata, secrets: state.available_secrets}),
          {:ok, response} <- request(option(state, :method), url, headers, body) do
       {:ok, response}
     else
