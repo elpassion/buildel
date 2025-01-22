@@ -3,6 +3,7 @@ defmodule Buildel.Blocks.NewApiCallTool do
   alias EditorField.Suggestion
   use Buildel.Blocks.NewBlock
   use Buildel.Blocks.NewBlock.HttpApi
+  alias Buildel.FlattenMap
 
   defblock(:api_call_tool,
     description: "Tool used to call HTTP APIs.",
@@ -194,7 +195,7 @@ defmodule Buildel.Blocks.NewApiCallTool do
     tool = @tools |> Enum.find(&(&1.name == :request))
 
     description = option(state, :description)
-
+IO.inspect(merge_schemas(state), label: "merge_schemas")
     tool = tool |> Map.put(:description, description) |> Map.put(:schema, merge_schemas(state))
   end
 
@@ -230,7 +231,7 @@ defmodule Buildel.Blocks.NewApiCallTool do
   end
 
   defp build_url(url_template, args) do
-    with {:ok, url} <- fill_url(url_template, flatten_map(args)),
+    with {:ok, url} <- fill_url(url_template, FlattenMap.flatten(args)),
          {:ok, uri} <- URI.new(url),
          {:ok, _} <- validate_scheme(uri.scheme) do
       {:ok, url}
@@ -325,21 +326,6 @@ defmodule Buildel.Blocks.NewApiCallTool do
 
   defp validate_args_search_params(_) do
     {:error, "Invalid search params"}
-  end
-
-  defp flatten_map(map) do
-    do_flatten_map(map, %{})
-  end
-
-  defp do_flatten_map(%{} = map, acc, parent_key \\ "") do
-    Enum.reduce(map, acc, fn {key, value}, acc ->
-      full_key = if parent_key == "", do: "#{key}", else: "#{parent_key}.#{key}"
-
-      case value do
-        %{} -> do_flatten_map(value, acc, full_key)
-        _ -> Map.put(acc, full_key, value)
-      end
-    end)
   end
 
   defp merge_schemas(state) do
