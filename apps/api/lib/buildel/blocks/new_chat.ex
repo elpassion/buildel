@@ -3,6 +3,8 @@ defmodule Buildel.Blocks.NewChat do
   alias Buildel.Blocks.Utils.ChatMemory
   alias Buildel.Blocks.Fields.EditorField
   alias EditorField.Suggestion
+  alias Buildel.FlattenMap
+  alias Buildel.Blocks.Utils.Injectable
   use Buildel.Blocks.NewBlock, tool_controller: true
   import Buildel.Blocks.Utils.Schemas
 
@@ -236,6 +238,28 @@ defmodule Buildel.Blocks.NewChat do
     })
   )
 
+
+  def setup(state) do
+    flattened_metadata =
+      FlattenMap.flatten(state.block.opts.metadata)
+
+    available_metadata = Injectable.used_metadata_keys([option(state, :prompt_template), option(state, :system_message)])
+    |> Enum.reduce(%{}, fn key, acc ->
+      acc
+      |> Map.put(key, flattened_metadata[key])
+    end)
+
+    aviailable_secrets =  Injectable.used_secrets_keys([option(state, :prompt_template), option(state, :system_message)])
+    |> Enum.reduce(%{}, fn secret, acc ->
+      acc
+      |> Map.put(secret, secret(state, secret))
+    end)
+
+    state = state |> Map.put(:available_metadata, available_metadata) |> Map.put(:available_secrets, aviailable_secrets)
+
+    {:ok, state}
+  end
+
   def handle_input(:input, %Message{} = message, state) do
     send_stream_start(state, :output, message)
 
@@ -438,7 +462,7 @@ defmodule Buildel.Blocks.NewChat do
   end
 
   defp initial_messages(state) do
-    [%{role: "system", content: option(state, :system_message)}] ++
+    [%{role: "system", content: fill_with_available_metadata_and_secrets(state, option(state, :system_message))}] ++
       option(state, :messages)
   end
 
@@ -454,7 +478,7 @@ defmodule Buildel.Blocks.NewChat do
     with filled_chat_messages <-
            state.memory
            |> ChatMemory.get_messages()
-           |> Kernel.++([%{role: "user", content: option(state, :prompt_template)}])
+           |> Kernel.++([%{role: "user", content: fill_with_available_metadata_and_secrets(state, option(state, :prompt_template))}])
            |> Enum.map(&fill_chat_message(latest_messages_to_inputs(state.latest_messages), &1)) do
       if(Enum.member?(filled_chat_messages, :error)) do
         {:error, :not_all_chat_messages_filled, state}
@@ -576,5 +600,26 @@ defmodule Buildel.Blocks.NewChat do
         send_stream_stop(state, :output, message)
         {:noreply, state}
     end
+  end
+
+  defp fill_with_available_metadata_and_secrets(state, string) do
+    %{metadata: state.available_metadata, secrets: state.available_secrets}
+    |> FlattenMap.flatten()
+    |> Enum.reduce(string, fn
+      {key, value}, acc when is_number(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string())
+
+      {key, value}, acc when is_binary(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string())
+
+      {key, value}, acc when is_map(value) ->
+        String.replace(acc, "{{#{key}}}", Jason.encode!(value))
+
+      {key, value}, acc when is_list(value) ->
+        String.replace(acc, "{{#{key}}}", Jason.encode!(value))
+
+      _, acc ->
+        acc
+    end)
   end
 end
