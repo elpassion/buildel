@@ -21,8 +21,8 @@ export async function loader(args: LoaderFunctionArgs) {
     if (!searchParams.has('page')) {
       searchParams.set('per_page', '30');
     }
-
     const { page, per_page, search, sort } = getParamsPagination(searchParams);
+
     const pipelinesPromise = pipelineApi.getPipelines(params.organizationId, {
       page,
       per_page,

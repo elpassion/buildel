@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { useInView } from 'react-intersection-observer';
 import type { MetaFunction } from '@remix-run/node';
 import {
   Outlet,
@@ -16,7 +17,12 @@ import {
   ListActionProvider,
   useListAction,
 } from '~/components/pages/knowledgeBase/components/ListActionProvider';
-import type { IKnowledgeBaseFileList } from '~/components/pages/knowledgeBase/knowledgeBase.types';
+import type {
+  IKnowledgeBaseFile,
+  IKnowledgeBaseFileList,
+} from '~/components/pages/knowledgeBase/knowledgeBase.types';
+import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
+import { useInfiniteFetch } from '~/components/pagination/useInfiniteFetch';
 import { Button } from '~/components/ui/button';
 import {
   DialogDrawer,
@@ -35,10 +41,25 @@ import { KnowledgeBaseFileList } from './KnowledgeBaseFileList';
 import type { loader } from './loader.server';
 
 export function KnowledgeBaseContentPage() {
-  const { fileList, organizationId, collectionName } =
+  const { ref: fetchNextRef, inView } = useInView();
+  const navigate = useNavigate();
+
+  const { fileList, organizationId, collectionName, pagination } =
     useLoaderData<typeof loader>();
 
-  const navigate = useNavigate();
+  const { hasNextPage, data, fetchNextPage, isFetchingNextPage } =
+    useInfiniteFetch<IKnowledgeBaseFile, typeof loader>({
+      pagination,
+      initialData: fileList,
+      loaderUrl: routes.collectionFiles(organizationId, collectionName),
+      dataExtractor: (response) => response.data?.fileList,
+    });
+
+  useEffect(() => {
+    if (inView && !isFetchingNextPage && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, isFetchingNextPage, hasNextPage]);
 
   const matchNew = useMatch(
     `:organizationId/knowledge-base/:collectionName/content/new`,
@@ -73,7 +94,7 @@ export function KnowledgeBaseContentPage() {
     <ListActionProvider>
       <PageContentWrapper className="mt-5">
         <div className="flex justify-between gap-2 items-center  mb-4">
-          {fileList.length > 0 ? <SelectAllButton items={fileList} /> : null}
+          {data.length > 0 ? <SelectAllButton items={data} /> : null}
 
           <Button asChild className="w-fit ml-auto mr-0 flex">
             <BasicLink
@@ -84,7 +105,16 @@ export function KnowledgeBaseContentPage() {
           </Button>
         </div>
 
-        <KnowledgeBaseFileList items={fileList} />
+        <KnowledgeBaseFileList items={data} />
+
+        <div className="flex justify-center mt-5" ref={fetchNextRef}>
+          <LoadMoreButton
+            isFetching={isFetchingNextPage}
+            hasNextPage={hasNextPage}
+            onClick={fetchNextPage}
+            className="text-xs"
+          />
+        </div>
 
         <DialogDrawer open={isSidebarOpen} onOpenChange={handleClose}>
           <DialogDrawerContent

@@ -67,11 +67,14 @@ export class KnowledgeBaseApi {
   async getCollectionMemories(
     organizationId: string | number,
     collectionId: string | number,
+    queryParams?: Partial<PaginationQueryParams>,
   ) {
-    return this.client(
-      KnowledgeBaseFileListResponse,
+    const url = buildUrlWithParams(
       `/organizations/${organizationId}/memory_collections/${collectionId}/memories`,
+      { ...queryParams },
     );
+
+    return this.client(KnowledgeBaseFileListResponse, url);
   }
 
   async getCollectionCosts(

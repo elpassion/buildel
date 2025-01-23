@@ -63,11 +63,16 @@ export const usePagination = (initialPagination?: Partial<Pagination>) => {
   };
 };
 
-export function getParamsPagination(params: URLSearchParams) {
+export function getParamsPagination(
+  params: URLSearchParams,
+  defaults?: Partial<typeof DEFAULT_PAGINATION>,
+) {
+  const defaultPagination = { ...DEFAULT_PAGINATION, ...defaults };
+
   return {
-    page: Number(params.get('page')) || DEFAULT_PAGINATION.page,
-    per_page: Number(params.get('per_page')) || DEFAULT_PAGINATION.per_page,
-    search: params.get('search') || DEFAULT_PAGINATION.search,
-    sort: params.get('sort') || DEFAULT_PAGINATION.sort,
+    page: Number(params.get('page')) || defaultPagination.page,
+    per_page: Number(params.get('per_page')) || defaultPagination.per_page,
+    search: params.get('search') || defaultPagination.search,
+    sort: params.get('sort') || defaultPagination.sort,
   };
 }

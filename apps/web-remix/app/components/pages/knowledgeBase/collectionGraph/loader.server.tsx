@@ -24,7 +24,9 @@ export async function loader(args: LoaderFunctionArgs) {
     const extend_neighbors =
       url.searchParams.get('extend_neighbors') === 'true';
     const extend_parents = url.searchParams.get('extend_parents') === 'true';
-    const memory_id = url.searchParams.get('memory_id') ? Number(url.searchParams.get('memory_id')) : undefined;
+    const memory_id = url.searchParams.get('memory_id')
+      ? Number(url.searchParams.get('memory_id'))
+      : undefined;
 
     const knowledgeBaseApi = new KnowledgeBaseApi(fetch);
 
@@ -92,7 +94,7 @@ export async function loader(args: LoaderFunctionArgs) {
       prevNode,
       nextNode,
       searchParams,
-      fileList: knowledgeBase.data,
+      fileList: knowledgeBase.data.data,
     });
   })(args);
 }

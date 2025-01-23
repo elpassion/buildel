@@ -72,7 +72,7 @@ export async function loader(args: LoaderFunctionArgs) {
       metadata,
       organizationId: params.organizationId,
       collectionName: params.collectionName,
-      fileList: knowledgeBase.data,
+      fileList: knowledgeBase.data.data,
     });
   })(args);
 }

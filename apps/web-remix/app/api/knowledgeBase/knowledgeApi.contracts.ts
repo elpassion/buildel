@@ -124,8 +124,9 @@ export const KnowledgeBaseCollectionList = z.array(KnowledgeBaseCollection);
 export const KnowledgeBaseFileListResponse = z
   .object({
     data: KnowledgeBaseFileList,
+    meta: PaginationMeta,
   })
-  .transform((res) => res.data);
+  .transform((res) => ({ data: res.data, meta: res.meta }));
 
 export type IKnowledgeBaseFileListResponse = z.TypeOf<
   typeof KnowledgeBaseFileListResponse
