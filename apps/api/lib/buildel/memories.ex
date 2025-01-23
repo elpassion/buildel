@@ -5,6 +5,29 @@ defmodule Buildel.Memories do
   alias Buildel.Organizations
   import Ecto.Query
 
+
+  defmodule ListParams do
+    defstruct [:page, :per_page]
+
+    def from_map(params) do
+      %__MODULE__{}
+      |> struct(%{
+        page:
+          Map.get(params, "page", nil)
+          |> then(fn
+            nil -> nil
+            page -> String.to_integer(page)
+          end),
+        per_page:
+          Map.get(params, "per_page", nil)
+          |> then(fn
+            nil -> nil
+            per_page -> String.to_integer(per_page)
+          end)
+      })
+    end
+  end
+
   def create_memory_collection_cost(
         %Buildel.Memories.MemoryCollection{} = collection,
         %Buildel.Costs.Cost{} = cost,
@@ -32,6 +55,32 @@ defmodule Buildel.Memories do
       m.collection_name == ^collection.collection_name and m.organization_id == ^organization.id
     )
     |> Buildel.Repo.all()
+  end
+
+  def list_organization_collection_memories(
+        %Buildel.Organizations.Organization{} = organization,
+        %Buildel.Memories.MemoryCollection{} = collection,
+        %ListParams{} = params
+      ) do
+    query = Buildel.Memories.Memory
+            |> where(
+                 [m],
+                 m.collection_name == ^collection.collection_name and m.organization_id == ^organization.id
+               )
+
+    items =
+      case params do
+        %{page: nil, per_page: nil} ->
+          query |> Buildel.Repo.all()
+
+        %{page: page, per_page: per_page} ->
+          offset = page * per_page
+          query |> limit(^per_page) |> offset(^offset) |> Buildel.Repo.all()
+      end
+
+    count = query |> Buildel.Repo.aggregate(:count, :id)
+
+    {:ok, items, count}
   end
 
   def list_organization_collections(

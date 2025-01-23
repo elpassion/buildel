@@ -36,13 +36,17 @@ defmodule BuildelWeb.MemoryController do
       ) do
     user = conn.assigns.current_user
 
+    params =
+      Buildel.Memories.ListParams.from_map(conn.query_params)
+
     with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
          {:ok, collection} <-
            Buildel.Memories.get_organization_collection(organization, memory_collection_id),
-         memories <-
-           Buildel.Memories.list_organization_collection_memories(organization, collection) do
-      render(conn, :index, memories: memories)
+         {:ok, memories, count} <-
+           Buildel.Memories.list_organization_collection_memories(organization, collection, params) do
+
+      render(conn, :index, memories: memories, params: params, total: count)
     end
   end
 
