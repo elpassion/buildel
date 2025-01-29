@@ -9,6 +9,7 @@ export default defineConfig({
     setupFiles: [
       './app/tests/setupFiles.ts',
       './app/tests/CodeMirror.mock.tsx',
+      './app/tests/Captcha.mock.tsx',
     ],
     environment: 'jsdom',
     globals: true,

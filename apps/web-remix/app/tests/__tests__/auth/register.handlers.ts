@@ -30,6 +30,10 @@ export const handlers = [
       { status: 200 },
     );
   }),
+
+  http.post('/api/captcha', () => {
+    return HttpResponse.json('ok', { status: 200 });
+  }),
 ];
 
 export const errorHandlers = [

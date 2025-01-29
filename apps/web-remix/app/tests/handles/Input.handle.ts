@@ -48,4 +48,12 @@ export class InputHandle {
   get value() {
     return this.inputElement.value;
   }
+
+  click() {
+    if (this.isDisabled()) {
+      throw new Error(`(${this.inputElement.name}) input is disabled!`);
+    }
+
+    this.inputElement.click();
+  }
 }

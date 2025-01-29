@@ -83,10 +83,11 @@ class RegisterObject {
   }
 
   async fillInputs() {
-    const { emailInput, passwordInput } = await this.getElements();
+    const { emailInput, passwordInput, captcha } = await this.getElements();
 
     await emailInput.type('test@gmail.com');
     await passwordInput.type('password123456');
+    await captcha.type('12345678901234567890');
 
     return this;
   }
@@ -95,7 +96,8 @@ class RegisterObject {
     const button = await ButtonHandle.fromRole();
     const emailInput = await InputHandle.fromLabelText(/email/i);
     const passwordInput = await InputHandle.fromLabelText(/password/i);
+    const captcha = await InputHandle.fromTestId('mock-v2-captcha-element');
 
-    return { button, emailInput, passwordInput };
+    return { button, emailInput, passwordInput, captcha };
   }
 }
