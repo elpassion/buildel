@@ -89,12 +89,40 @@ defmodule Buildel.Memories do
       ) do
     Buildel.Memories.MemoryCollection
     |> where(
+         [m],
+         m.organization_id == ^organization.id
+       )
+    |> where([m], ^collection_filters(params))
+    |> maybe_add_search_query(params)
+    |> Buildel.Repo.all()
+  end
+
+  def list_organization_collections(
+        %Buildel.Organizations.Organization{} = organization,
+        params,
+        %ListParams{} = queryParams
+      ) do
+   query = Buildel.Memories.MemoryCollection
+    |> where(
       [m],
       m.organization_id == ^organization.id
     )
     |> where([m], ^collection_filters(params))
     |> maybe_add_search_query(params)
-    |> Buildel.Repo.all()
+
+    items =
+      case queryParams do
+        %{page: nil, per_page: nil} ->
+          query |> Buildel.Repo.all()
+
+        %{page: page, per_page: per_page} ->
+          offset = page * per_page
+          query |> limit(^per_page) |> offset(^offset) |> Buildel.Repo.all()
+      end
+
+    count = query |> Buildel.Repo.aggregate(:count, :id)
+
+   {:ok, items, count}
   end
 
   defp collection_filters(params) do

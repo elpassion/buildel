@@ -101,7 +101,10 @@ defmodule BuildelWeb.CollectionController do
         schema: %Schema{type: :string},
         required: false
       ]
-    ],
+    ] ++ BuildelWeb.Schemas.Pagination.default_params(%{
+           page: nil,
+           per_page: nil
+    }),
     request_body: nil,
     responses: [
       ok: {"ok", "application/json", BuildelWeb.Schemas.Collections.IndexResponse},
@@ -115,11 +118,16 @@ defmodule BuildelWeb.CollectionController do
     %{organization_id: organization_id} = conn.params
     user = conn.assigns.current_user
 
+    queryParams =
+      Buildel.Memories.ListParams.from_map(conn.query_params)
+
+
     with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
-         collections <-
-           Buildel.Memories.list_organization_collections(organization, conn.params) do
-      render(conn, :index, collections: collections)
+         {:ok, collections, count} <-
+           Buildel.Memories.list_organization_collections(organization, conn.params, queryParams) do
+
+      render(conn, :index, collections: collections, params: queryParams, total: count)
     end
   end
 

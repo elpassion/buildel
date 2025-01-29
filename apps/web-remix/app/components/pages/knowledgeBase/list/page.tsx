@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
 import type { MetaFunction } from '@remix-run/node';
 import {
   Outlet,
@@ -13,6 +14,9 @@ import { SearchInput } from '~/components/form/inputs/search.input.tsx';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
+import type { IKnowledgeBaseCollection } from '~/components/pages/knowledgeBase/knowledgeBase.types';
+import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
+import { useInfiniteFetch } from '~/components/pagination/useInfiniteFetch';
 import { Button } from '~/components/ui/button';
 import {
   DialogDrawer,
@@ -31,7 +35,9 @@ import { KnowledgeBaseCollectionList } from './KnowledgeBaseCollectionList';
 import type { loader } from './loader.server';
 
 export function KnowledgeBasePage() {
-  const { organizationId, collections, search } =
+  const { ref: fetchNextRef, inView } = useInView();
+
+  const { organizationId, collections, pagination, search } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const matchNew = useMatch(routes.knowledgeBaseNew(organizationId));
@@ -40,6 +46,20 @@ export function KnowledgeBasePage() {
     if (value) return;
     navigate(routes.knowledgeBase(organizationId));
   };
+
+  const { hasNextPage, data, fetchNextPage, isFetchingNextPage } =
+    useInfiniteFetch<IKnowledgeBaseCollection, typeof loader>({
+      pagination,
+      initialData: collections,
+      loaderUrl: routes.knowledgeBase(organizationId),
+      dataExtractor: (response) => response.data?.collections,
+    });
+
+  useEffect(() => {
+    if (inView && !isFetchingNextPage && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, isFetchingNextPage, hasNextPage]);
 
   return (
     <>
@@ -68,8 +88,17 @@ export function KnowledgeBasePage() {
 
         <KnowledgeBaseCollectionList
           organizationId={organizationId}
-          items={collections}
+          items={data}
         />
+
+        <div className="flex justify-center mt-5" ref={fetchNextRef}>
+          <LoadMoreButton
+            isFetching={isFetchingNextPage}
+            hasNextPage={hasNextPage}
+            onClick={fetchNextPage}
+            className="text-xs"
+          />
+        </div>
       </PageContentWrapper>
     </>
   );

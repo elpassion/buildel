@@ -135,12 +135,13 @@ export type IKnowledgeBaseFileListResponse = z.TypeOf<
 export const KnowledgeBaseCollectionListResponse = z
   .object({
     data: KnowledgeBaseCollectionList,
+    meta: PaginationMeta,
   })
-  .transform((res) => res.data);
+  .transform((res) => ({ data: res.data, meta: res.meta }));
 
 export const KnowledgeBaseCollectionFromListResponse =
   KnowledgeBaseCollectionListResponse.transform((res) => {
-    const collection = res[0];
+    const collection = res.data[0];
 
     if (!collection) {
       throw new NotFoundError();

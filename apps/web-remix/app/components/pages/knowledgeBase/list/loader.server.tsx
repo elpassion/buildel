@@ -15,16 +15,26 @@ export async function loader(args: LoaderFunctionArgs) {
     const knowledgeBaseApi = new KnowledgeBaseApi(fetch);
 
     const searchParams = new URL(request.url).searchParams;
-    const { search } = getParamsPagination(searchParams);
+
+    const { page, per_page, search, ...rest } = getParamsPagination(
+      searchParams,
+      {
+        per_page: 10,
+      },
+    );
 
     const collections = await knowledgeBaseApi.getCollections(
       params.organizationId,
-      { search },
+      { search, per_page, page },
     );
+
+    const totalItems = collections.data.meta.total;
+    const totalPages = Math.ceil(totalItems / per_page);
 
     return json({
       organizationId: params.organizationId,
-      collections: collections.data,
+      collections: collections.data.data,
+      pagination: { page, per_page, totalPages, totalItems, search, ...rest },
       search,
     });
   })(args);
