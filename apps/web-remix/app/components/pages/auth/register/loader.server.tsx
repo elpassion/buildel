@@ -18,6 +18,9 @@ export async function loader(args: LoaderFunctionArgs) {
       return redirect(routes.login);
     }
 
-    return json({ googleLoginEnabled: !!process.env.GOOGLE_CLIENT_ID });
+    return json({
+      googleLoginEnabled: !!process.env.GOOGLE_CLIENT_ID,
+      googleCaptchaKey: process.env.GOOGLE_CAPTCHA_KEY,
+    });
   })(args);
 }

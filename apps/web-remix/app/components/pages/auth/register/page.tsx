@@ -1,6 +1,9 @@
 import * as React from 'react';
+import { useState } from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
 import type { MetaFunction } from '@remix-run/node';
 import { Link, useLoaderData, useSearchParams } from '@remix-run/react';
+import { ClientOnly } from 'remix-utils/client-only';
 
 import { Field, HiddenField } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
@@ -20,7 +23,10 @@ import type { loader } from './loader.server';
 import { schema } from './schema';
 
 export function RegisterPage() {
-  const { googleLoginEnabled } = useLoaderData<typeof loader>();
+  const captchaRef = React.useRef<ReCAPTCHA>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const { googleLoginEnabled, googleCaptchaKey } =
+    useLoaderData<typeof loader>();
   const validator = React.useMemo(() => withZod(schema), []);
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get('redirectTo');
@@ -49,6 +55,9 @@ export function RegisterPage() {
           method="post"
           noValidate
           className="w-full max-w-md mt-10"
+          onSubmitFailure={() => {
+            captchaRef.current?.reset();
+          }}
         >
           <HiddenField name="redirectTo" value={redirectTo ?? undefined} />
 
@@ -68,6 +77,27 @@ export function RegisterPage() {
           </div>
           <div className="mb-4">
             <Field name="global">
+              <FieldMessage />
+            </Field>
+          </div>
+
+          <div className="mb-3 min-h-[78px]">
+            <ClientOnly>
+              {() => (
+                <ReCAPTCHA
+                  ref={captchaRef}
+                  size="normal"
+                  sitekey={googleCaptchaKey ?? ''}
+                  onChange={setCaptchaToken}
+                />
+              )}
+            </ClientOnly>
+
+            <Field name="captchaToken">
+              <HiddenField
+                name="captchaToken"
+                value={captchaToken ?? undefined}
+              />
               <FieldMessage />
             </Field>
           </div>

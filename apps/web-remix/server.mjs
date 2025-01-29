@@ -170,14 +170,14 @@ console.log(`✅ metrics ready: ${metricsAddrers}`);
 
 function createCSP(nonce, isIframeAllowed) {
   let csp = `
-    script-src 'self' 'nonce-${nonce}' https://www.youtube.com;
+    script-src 'self' 'nonce-${nonce}' https://www.youtube.com https://www.google.com/recaptcha/api.js;
     img-src * blob: data: 'self';
     font-src 'self' https://fonts.gstatic.com https://elpassion-design-system.s3.eu-west-1.amazonaws.com https://cdnjs.cloudflare.com;
     connect-src 'self' ${process.env.NODE_ENV === 'development' ? 'ws:' : ''} ${process.env.API_URL} https://plausible.io;
     style-src 'unsafe-inline' 'self' https://fonts.googleapis.com;
     style-src-elem 'unsafe-inline' 'self' https://fonts.googleapis.com;
     object-src 'none';
-    frame-src 'self' https://www.youtube.com;
+    frame-src 'self' https://www.youtube.com https://www.google.com https://www.google.com/recaptcha/;
     base-uri 'self';
     form-action 'self' https://www.googleapis.com https://accounts.google.com https://github.com;
     upgrade-insecure-requests;

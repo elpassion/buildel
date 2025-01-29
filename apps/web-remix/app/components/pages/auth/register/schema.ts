@@ -6,4 +6,5 @@ export const schema = z.object({
     password: z.string().min(12),
   }),
   redirectTo: z.string().optional(),
+  captchaToken: z.string().min(10, 'Please complete the captcha.'),
 });

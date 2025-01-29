@@ -12,20 +12,37 @@ import { schema } from './schema';
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
-    post: async ({ request }, { fetch }) => {
+    post: async ({ request }, { fetch: extraFetch }) => {
       const validator = withZod(schema);
 
       const result = await validator.validate(await request.formData());
 
       if (result.error) return validationError(result.error);
 
-      const authApi = new AuthApi(fetch);
+      const captchaResponse = await fetch(
+        `${process.env.PAGE_URL}/api/captcha`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ token: result.data.captchaToken }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (captchaResponse.status !== 200) {
+        return validationError({
+          fieldErrors: { captchaToken: 'Captcha validation failed' },
+        });
+      }
+
+      const authApi = new AuthApi(extraFetch);
 
       const response = await authApi.signUp(result.data.user);
 
       const authCookie = response.headers.get('Set-Cookie')!;
 
-      const meResponse = await fetch(CurrentUserResponse, '/users/me', {
+      const meResponse = await extraFetch(CurrentUserResponse, '/users/me', {
         headers: {
           Cookie: authCookie,
         },
