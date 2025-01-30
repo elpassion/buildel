@@ -20,7 +20,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
     return json({
       googleLoginEnabled: !!process.env.GOOGLE_CLIENT_ID,
-      googleCaptchaKey: process.env.GOOGLE_CAPTCHA_KEY,
+      googleCaptchaKey: process.env.GOOGLE_CAPTCHA_KEY ?? null,
     });
   })(args);
 }

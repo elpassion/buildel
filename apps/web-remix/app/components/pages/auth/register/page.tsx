@@ -20,14 +20,20 @@ import { ValidatedForm, withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 
 import type { loader } from './loader.server';
-import { schema } from './schema';
+import { schema, schemaWithCaptcha } from './schema';
 
 export function RegisterPage() {
   const captchaRef = React.useRef<ReCAPTCHA>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const { googleLoginEnabled, googleCaptchaKey } =
     useLoaderData<typeof loader>();
-  const validator = React.useMemo(() => withZod(schema), []);
+
+  const isCaptchEnabled = !!googleCaptchaKey;
+
+  const validator = React.useMemo(
+    () => withZod(isCaptchEnabled ? schemaWithCaptcha : schema),
+    [],
+  );
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get('redirectTo');
 
@@ -81,26 +87,28 @@ export function RegisterPage() {
             </Field>
           </div>
 
-          <div className="mb-3 min-h-[78px]">
-            <ClientOnly>
-              {() => (
-                <ReCAPTCHA
-                  ref={captchaRef}
-                  size="normal"
-                  sitekey={googleCaptchaKey ?? ''}
-                  onChange={setCaptchaToken}
-                />
-              )}
-            </ClientOnly>
+          {isCaptchEnabled ? (
+            <div className="mb-3 min-h-[78px]">
+              <ClientOnly>
+                {() => (
+                  <ReCAPTCHA
+                    ref={captchaRef}
+                    size="normal"
+                    sitekey={googleCaptchaKey ?? ''}
+                    onChange={setCaptchaToken}
+                  />
+                )}
+              </ClientOnly>
 
-            <Field name="captchaToken">
-              <HiddenField
-                name="captchaToken"
-                value={captchaToken ?? undefined}
-              />
-              <FieldMessage />
-            </Field>
-          </div>
+              <Field name="captchaToken">
+                <HiddenField
+                  name="captchaToken"
+                  value={captchaToken ?? undefined}
+                />
+                <FieldMessage />
+              </Field>
+            </div>
+          ) : null}
 
           <SubmitButton isFluid>Register</SubmitButton>
         </ValidatedForm>
