@@ -11,8 +11,9 @@ defmodule Buildel.JQ do
     try do
       case System.cmd("jq", ["-c", "-r", query, tmp_path]) do
         {shortened_payload, 0} -> shortened_payload
-        {"", 3} -> payload
-        {"", 5} -> payload
+        {_, 3} -> payload
+        {_, 5} -> payload
+        {_, 4} -> payload
       end
     after
       File.rm!(tmp_path)
