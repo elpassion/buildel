@@ -17,6 +17,7 @@ import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import type { IKnowledgeBaseCollection } from '~/components/pages/knowledgeBase/knowledgeBase.types';
 import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
 import { useInfiniteFetch } from '~/components/pagination/useInfiniteFetch';
+import type { Pagination } from '~/components/pagination/usePagination';
 import { Button } from '~/components/ui/button';
 import {
   DialogDrawer,
@@ -35,8 +36,6 @@ import { KnowledgeBaseCollectionList } from './KnowledgeBaseCollectionList';
 import type { loader } from './loader.server';
 
 export function KnowledgeBasePage() {
-  const { ref: fetchNextRef, inView } = useInView();
-
   const { organizationId, collections, pagination, search } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
@@ -46,20 +45,6 @@ export function KnowledgeBasePage() {
     if (value) return;
     navigate(routes.knowledgeBase(organizationId));
   };
-
-  const { hasNextPage, data, fetchNextPage, isFetchingNextPage } =
-    useInfiniteFetch<IKnowledgeBaseCollection, typeof loader>({
-      pagination,
-      initialData: collections,
-      loaderUrl: routes.knowledgeBase(organizationId),
-      dataExtractor: (response) => response.data?.collections,
-    });
-
-  useEffect(() => {
-    if (inView && !isFetchingNextPage && hasNextPage) {
-      fetchNextPage();
-    }
-  }, [inView, isFetchingNextPage, hasNextPage]);
 
   return (
     <>
@@ -86,19 +71,12 @@ export function KnowledgeBasePage() {
       <PageContentWrapper className="mt-6">
         <CollectionsFilter defaultValues={{ search }} className="-mt-1 mb-10" />
 
-        <KnowledgeBaseCollectionList
+        <InfiniteLoadedList
+          key={search ?? 'all'}
+          initialData={collections}
+          pagination={pagination}
           organizationId={organizationId}
-          items={data}
         />
-
-        <div className="flex justify-center mt-5" ref={fetchNextRef}>
-          <LoadMoreButton
-            isFetching={isFetchingNextPage}
-            hasNextPage={hasNextPage}
-            onClick={fetchNextPage}
-            className="text-xs"
-          />
-        </div>
       </PageContentWrapper>
     </>
   );
@@ -165,5 +143,49 @@ function CollectionsFilter({
 
       {children}
     </div>
+  );
+}
+
+function InfiniteLoadedList({
+  organizationId,
+  initialData,
+  pagination,
+}: {
+  organizationId: string;
+  initialData: IKnowledgeBaseCollection[];
+  pagination: Pagination;
+}) {
+  const { ref: fetchNextRef, inView } = useInView();
+
+  const { hasNextPage, data, fetchNextPage, isFetchingNextPage } =
+    useInfiniteFetch<IKnowledgeBaseCollection, typeof loader>({
+      pagination,
+      initialData: initialData,
+      loaderUrl: routes.knowledgeBase(organizationId),
+      dataExtractor: (response) => response.data?.collections,
+    });
+
+  useEffect(() => {
+    if (inView && !isFetchingNextPage && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, isFetchingNextPage, hasNextPage]);
+
+  return (
+    <>
+      <KnowledgeBaseCollectionList
+        organizationId={organizationId}
+        items={data}
+      />
+
+      <div className="flex justify-center mt-5" ref={fetchNextRef}>
+        <LoadMoreButton
+          isFetching={isFetchingNextPage}
+          hasNextPage={hasNextPage}
+          onClick={fetchNextPage}
+          className="text-xs"
+        />
+      </div>
+    </>
   );
 }
