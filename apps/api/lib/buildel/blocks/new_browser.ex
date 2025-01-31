@@ -1,5 +1,8 @@
 defmodule Buildel.Blocks.NewBrowserTool do
   alias Buildel.Blocks.Fields.EditorField
+  alias Buildel.Blocks.Utils.Injectable
+  alias EditorField.Suggestion
+  alias Buildel.FlattenMap
   alias Buildel.Crawler
   use Buildel.Blocks.NewBlock
   use Buildel.Blocks.NewBlock.HttpApi
@@ -33,7 +36,10 @@ defmodule Buildel.Blocks.NewBrowserTool do
     editorLanguage: "json",
     default: "{}",
     minLength: 1,
-    suggestions: []
+    suggestions: [
+      Suggestion.metadata(),
+      Suggestion.secrets()
+    ]
   }))
 
   deftool(:url,
@@ -50,6 +56,30 @@ defmodule Buildel.Blocks.NewBrowserTool do
       required: ["url"]
     }
   )
+
+
+  def setup(state) do
+    flattened_metadata =
+      FlattenMap.flatten(state.block.opts.metadata)
+
+    available_metadata = Injectable.used_metadata_keys([option(state, :headers)])
+                         |> Enum.reduce(%{}, fn key, acc ->
+      acc
+      |> Map.put(key, flattened_metadata[key])
+    end)
+
+    aviailable_secrets =  Injectable.used_secrets_keys([option(state, :headers)])
+                          |> Enum.reduce(%{}, fn secret, acc ->
+      acc
+      |> Map.put(secret, secret(state, secret))
+    end)
+
+
+    {:ok, state
+          |> Map.put(:available_metadata, available_metadata)
+          |> Map.put(:available_secrets, aviailable_secrets)}
+  end
+
 
   def handle_input(:url, %Message{type: :json, message: message_message} = message, state)
       when is_list(message_message) do
@@ -183,14 +213,12 @@ defmodule Buildel.Blocks.NewBrowserTool do
   defp crawl(state, url) do
     uri = URI.parse(url)
 
-    headers = option(state, :headers) |> Jason.decode!() |> Map.to_list()
-
     with {:ok, crawl} when length(crawl.pages) != 0 <-
            Crawler.crawl(url,
              max_depth: 1,
              url_filter: fn inc_url -> inc_url |> String.contains?(uri.host) end,
              client: httpApi(),
-             headers: headers
+             headers: fill_headers_with_available_metadata_and_secrets(state)
            ),
          {:ok, path} <- Temp.path(%{suffix: ".md"}),
          :ok <-
@@ -217,6 +245,24 @@ defmodule Buildel.Blocks.NewBrowserTool do
       {:error, reason} ->
         {:error, to_string(reason), state}
     end
+  end
+
+  defp fill_headers_with_available_metadata_and_secrets(state) do
+    headers = option(state, :headers) |> Jason.decode!()
+
+    flatten = %{metadata: state.available_metadata, secrets: state.available_secrets}
+              |> FlattenMap.flatten()
+              |> Enum.reduce(headers, fn
+      {key, value}, acc when is_number(value) ->
+         acc |> Enum.map(fn {k, v} -> {k, String.replace(v, "{{#{key}}}", to_string(value))} end)
+      {key, value}, acc when is_binary(value) ->
+        acc |> Enum.map(fn {k, v} -> {k, String.replace(v, "{{#{key}}}", to_string(value))} end)
+      {key, value}, acc when is_map(value) ->
+        acc |> Enum.map(fn {k, v} -> {k, String.replace(v, "{{#{key}}}", Jason.encode!(value))} end)
+      {key, value}, acc when is_list(value) ->
+        acc |> Enum.map(fn {k, v} -> {k, String.replace(v, "{{#{key}}}", Jason.encode!(value))} end)
+      _, acc -> acc
+    end)
   end
 
   defp build_url(url) do
