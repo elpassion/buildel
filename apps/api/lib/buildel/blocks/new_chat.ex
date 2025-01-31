@@ -14,6 +14,8 @@ defmodule Buildel.Blocks.NewChat do
     groups: ["llms", "text"]
   )
 
+  definput(:image, schema: %{}, type: :image)
+
   definput(:input, schema: %{})
 
   defoutput(:output, schema: %{})
@@ -255,9 +257,24 @@ defmodule Buildel.Blocks.NewChat do
       |> Map.put(secret, secret(state, secret))
     end)
 
-    state = state |> Map.put(:available_metadata, available_metadata) |> Map.put(:available_secrets, aviailable_secrets)
+    state = state
+            |> Map.put(:available_metadata, available_metadata)
+            |> Map.put(:available_secrets, aviailable_secrets)
+            |> Map.put(:images, [])
 
     {:ok, state}
+  end
+
+  def handle_input(:image, %Message{message: message_message, metadata: %{method: :delete}} = message, state) do
+    {:ok, state
+          |> Map.update(:images, [], &Enum.reject(&1, fn image -> image.message.file_id == message_message.file_id end))}
+  end
+
+  def handle_input(:image, %Message{} = message, state) do
+    {:ok, state
+           |> Map.update(:images, [], fn images ->
+      images ++ [message]
+    end)}
   end
 
   def handle_input(:input, %Message{} = message, state) do
@@ -265,7 +282,7 @@ defmodule Buildel.Blocks.NewChat do
 
     with {:ok, state} <- save_input_message(state, message),
          {:ok, chat_messages, state} <- fill_chat_messages(state),
-         {:ok, state} <- start_chat_completion(state, message, async: true),
+         {:ok, state} <- start_chat_completion(state, chat_messages, message, async: true),
          {:ok, state} <- save_chat_message(state, chat_messages |> Enum.at(-1)),
          state <- reset_latest_messages(state) do
       {:ok, state}
@@ -281,7 +298,7 @@ defmodule Buildel.Blocks.NewChat do
 
     with {:ok, state} <- save_input_message(state, message),
          {:ok, chat_messages, state} <- fill_chat_messages(state),
-         {:ok, result, state} <- start_chat_completion(state, message, async: false),
+         {:ok, result, state} <- start_chat_completion(state, chat_messages, message, async: false),
          {:ok, state} <- save_chat_message(state, chat_messages |> Enum.at(-1)),
          state <- reset_latest_messages(state) do
       {:ok, response |> Message.set_message(result), state}
@@ -315,18 +332,18 @@ defmodule Buildel.Blocks.NewChat do
     |> Enum.into(%{})
   end
 
-  defp start_chat_completion(state, message, async: false) do
-    task = Task.async(chat_completion_task(state, message))
+  defp start_chat_completion(state, chat_messages, message, async: false) do
+    task = Task.async(chat_completion_task(state, chat_messages, message))
     {:chat_completion, _message, last_message} = Task.await(task, 5 * 60_000)
     {:ok, last_message.content, state}
   end
 
-  defp start_chat_completion(state, message, async: true) do
-    Task.start(chat_completion_task(state, message))
+  defp start_chat_completion(state, chat_messages, message, async: true) do
+    Task.start(chat_completion_task(state, chat_messages, message))
     {:ok, state}
   end
 
-  defp chat_completion_task(state, message) do
+  defp chat_completion_task(state, chat_messages, message) do
     pid = self()
 
     fn ->
@@ -351,9 +368,7 @@ defmodule Buildel.Blocks.NewChat do
             }
         end
 
-      with {:ok, chat_messages, state} <- fill_chat_messages(state),
-           {:ok, _, last_message} <-
-             chat().stream_chat(
+     case chat().stream_chat(
                messages: chat_messages,
                model: option(state, :model),
                api_key: secret(state, option(state, :api_key)),
@@ -433,8 +448,8 @@ defmodule Buildel.Blocks.NewChat do
                    send_stream_stop(state, :output, message)
                end
              ) do
-        {:chat_completion, message, last_message}
-      else
+        {:ok, _, last_message} -> {:chat_completion, message, last_message}
+
         {:error, :context_length_exceeded} ->
           case state.memory do
             %{type: :full} ->
@@ -453,8 +468,8 @@ defmodule Buildel.Blocks.NewChat do
 
         error ->
           error
-      end
-    end
+        end
+     end
   end
 
   defp chat() do
@@ -475,17 +490,34 @@ defmodule Buildel.Blocks.NewChat do
         })
       end)
 
-    with filled_chat_messages <-
-           state.memory
-           |> ChatMemory.get_messages()
-           |> Kernel.++([%{role: "user", content: fill_with_available_metadata_and_secrets(state, option(state, :prompt_template))}])
-           |> Enum.map(&fill_chat_message(latest_messages_to_inputs(state.latest_messages), &1)) do
-      if(Enum.member?(filled_chat_messages, :error)) do
-        {:error, :not_all_chat_messages_filled, state}
-      else
-        {:ok, filled_chat_messages, state}
+    user_message = %{
+      role: "user",
+      content: fill_with_available_metadata_and_secrets(state, option(state, :prompt_template))
+    }
+
+    filled_base_messages =
+      ChatMemory.get_messages(state.memory)
+      |> Enum.map(&fill_chat_message(latest_messages_to_inputs(state.latest_messages), &1))
+
+    if Enum.member?(filled_base_messages, :error) do
+      {:error, :not_all_chat_messages_filled, state}
+    else
+      case fill_chat_message(latest_messages_to_inputs(state.latest_messages), user_message) do
+        :error ->
+          {:error, :not_all_chat_messages_filled, state}
+
+        filled_user_message ->
+          case add_images_to_message(state, filled_user_message) do
+            {:ok, final_user_message, state} ->
+              filled_chat_messages = filled_base_messages ++ [final_user_message]
+              {:ok, filled_chat_messages, state}
+
+            {:error, reason} ->
+              {:error, reason, state}
+          end
       end
     end
+
   end
 
   defp latest_messages_to_inputs(latest_messages) do
@@ -499,6 +531,10 @@ defmodule Buildel.Blocks.NewChat do
 
   defp fill_chat_message(_, :error) do
     :error
+  end
+
+  defp fill_chat_message(_inputs, %{content: content} = chat_message) when is_list(content) do
+    chat_message
   end
 
   defp fill_chat_message({input, nil}, chat_message) do
@@ -586,7 +622,7 @@ defmodule Buildel.Blocks.NewChat do
   def handle_info({:remove_latest_message_and_start_chat_completion, message}, state) do
     with {:ok, memory} <- ChatMemory.drop_first_non_initial_message(state.memory),
          state <- put_in(state.memory, memory),
-         {:ok, state} <- start_chat_completion(state, message, async: true) do
+         {:ok, state} <- start_chat_completion(state, state.memory, message, async: true) do
       {:noreply, state}
     else
       {:error, :full_chat_memory} ->
@@ -621,5 +657,30 @@ defmodule Buildel.Blocks.NewChat do
       _, acc ->
         acc
     end)
+  end
+
+  defp add_images_to_message(%{images: []} = state, message) do
+    {:ok, message, state}
+  end
+
+  defp add_images_to_message(%{images: images} = state, %{content: content} = message) do
+    images =
+      images |> Enum.map(fn image ->
+        %{
+          type: :image,
+          content: read_image(image.message.path),
+          media: image.message.file_type
+        }
+      end)
+
+    message = %{message | content: images ++ [%{type: :text, content: content}]}
+
+    {:ok, message, %{state | images: []}}
+  end
+
+  defp read_image(image_path) do
+    image_path
+    |> File.read!()
+    |> Base.encode64()
   end
 end
