@@ -5,6 +5,17 @@ defmodule Buildel.Datasets do
   alias Buildel.Datasets.Dataset
   alias Buildel.Repo
 
+  defmodule ListParams do
+    defstruct [:search]
+
+    def from_map(params) do
+      %__MODULE__{}
+      |> struct(%{
+        search: Map.get(params, :search, nil)
+      })
+    end
+  end
+
   def stream_csv(conn, dataset_id) do
     query =
       from dr in DatasetRow,
@@ -52,6 +63,21 @@ defmodule Buildel.Datasets do
 
   def delete_dataset(%Dataset{} = dataset) do
     Repo.delete(dataset)
+  end
+
+  def list_organization_datasets(%Organization{} = organization, %ListParams{} = params) do
+    from(d in Dataset,
+      where: d.organization_id == ^organization.id ,
+      order_by: [desc: d.inserted_at]
+    )
+    |> then(fn q ->
+      case params.search do
+        nil -> q
+        "" -> q
+        search -> q |> where([d], ilike(d.name, ^"%#{search}%"))
+      end
+    end)
+    |> Repo.all()
   end
 
   def list_organization_datasets(%Organization{} = organization) do

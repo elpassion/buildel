@@ -1,4 +1,7 @@
 defmodule BuildelWeb.DatasetController do
+  alias Buildel.Datasets
+  alias OpenApiSpex.Schema
+
   import BuildelWeb.UserAuth
   use BuildelWeb, :controller
   use OpenApiSpex.ControllerSpecs
@@ -44,7 +47,13 @@ defmodule BuildelWeb.DatasetController do
   operation :index,
     summary: "List organization datasets",
     parameters: [
-      organization_id: [in: :path, description: "Organization ID", type: :integer]
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      search: [
+        in: :query,
+        description: "Search query",
+        schema: %Schema{type: :string},
+        required: false
+      ]
     ],
     request_body: nil,
     responses: [
@@ -59,10 +68,13 @@ defmodule BuildelWeb.DatasetController do
     %{organization_id: organization_id} = conn.params
     user = conn.assigns.current_user
 
+    params =
+      Datasets.ListParams.from_map(conn.params)
+
     with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
          datasets <-
-           Buildel.Datasets.list_organization_datasets(organization) do
+           Buildel.Datasets.list_organization_datasets(organization, params) do
       render(conn, :index, datasets: datasets)
     end
   end

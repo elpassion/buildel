@@ -19,11 +19,16 @@ import {
 export class DatasetApi {
   constructor(private client: typeof fetchTyped) {}
 
-  async getDatasets(organizationId: string | number) {
-    return this.client(
-      DatasetsResponse,
+  async getDatasets(
+    organizationId: string | number,
+    queryParams: Partial<PaginationQueryParams>,
+  ) {
+    const url = buildUrlWithParams(
       `/organizations/${organizationId}/datasets`,
+      { ...queryParams },
     );
+
+    return this.client(DatasetsResponse, url);
   }
 
   async getDataset(
