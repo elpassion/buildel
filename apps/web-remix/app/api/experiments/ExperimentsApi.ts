@@ -16,11 +16,15 @@ import {
 export class ExperimentsApi {
   constructor(private client: typeof fetchTyped) {}
 
-  async getExperiments(organizationId: string | number) {
-    return this.client(
-      ExperimentsResponse,
+  async getExperiments(
+    organizationId: string | number,
+    queryParams: Partial<PaginationQueryParams>,
+  ) {
+    const url = buildUrlWithParams(
       `/organizations/${organizationId}/experiments`,
+      { ...queryParams },
     );
+    return this.client(ExperimentsResponse, url);
   }
 
   async getExperiment(

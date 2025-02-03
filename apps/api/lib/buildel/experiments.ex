@@ -4,6 +4,17 @@ defmodule Buildel.Experiments do
   alias Buildel.Organizations.Organization
   alias Buildel.Repo
 
+  defmodule ListParams do
+    defstruct [:search]
+
+    def from_map(params) do
+      %__MODULE__{}
+      |> struct(%{
+        search: Map.get(params, :search, nil)
+      })
+    end
+  end
+
   def list_experiments do
     Repo.all(Experiment)
     |> Repo.preload([:pipeline, :dataset])
@@ -32,6 +43,22 @@ defmodule Buildel.Experiments do
 
   def delete_experiment(%Experiment{} = experiment) do
     Repo.delete(experiment)
+  end
+
+  def list_organization_experiments(%Organization{} = organization, %ListParams{} = params) do
+    from(d in Experiment,
+      where: d.organization_id == ^organization.id,
+      order_by: [desc: d.inserted_at]
+    )
+    |> then(fn q ->
+      case params.search do
+        nil -> q
+        "" -> q
+        search -> q |> where([d], ilike(d.name, ^"%#{search}%"))
+      end
+    end)
+    |> Repo.all()
+    |> Repo.preload([:pipeline, :dataset])
   end
 
   def list_organization_experiments(%Organization{} = organization) do

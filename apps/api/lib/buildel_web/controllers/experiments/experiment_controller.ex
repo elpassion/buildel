@@ -1,4 +1,6 @@
 defmodule BuildelWeb.ExperimentController do
+  alias OpenApiSpex.Schema
+
   import BuildelWeb.UserAuth
   use BuildelWeb, :controller
   use OpenApiSpex.ControllerSpecs
@@ -44,7 +46,13 @@ defmodule BuildelWeb.ExperimentController do
   operation :index,
     summary: "List organization experiments",
     parameters: [
-      organization_id: [in: :path, description: "Organization ID", type: :integer]
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      search: [
+        in: :query,
+        description: "Search query",
+        schema: %Schema{type: :string},
+        required: false
+      ]
     ],
     request_body: nil,
     responses: [
@@ -59,10 +67,13 @@ defmodule BuildelWeb.ExperimentController do
     %{organization_id: organization_id} = conn.params
     user = conn.assigns.current_user
 
+    params =
+      Buildel.Experiments.ListParams.from_map(conn.params)
+
     with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
          experiments <-
-           Buildel.Experiments.list_organization_experiments(organization) do
+           Buildel.Experiments.list_organization_experiments(organization, params) do
       render(conn, :index, experiments: experiments)
     end
   end

@@ -1,7 +1,9 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { Outlet, useLoaderData } from '@remix-run/react';
+import { Outlet, useLoaderData, useSearchParams } from '@remix-run/react';
+import debounce from 'lodash.debounce';
 
+import { SearchInput } from '~/components/form/inputs/search.input.tsx';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
@@ -13,22 +15,46 @@ import { routes } from '~/utils/routes.utils';
 import type { loader } from './loader.server';
 
 export function ExperimentsPage() {
-  const { organizationId, experiments } = useLoaderData<typeof loader>();
+  const { organizationId, experiments, search } =
+    useLoaderData<typeof loader>();
+
+  const [_, setSearchParams] = useSearchParams();
+
+  const onSearchChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchParams((prev) => {
+      prev.set('search', e.target.value);
+
+      return prev;
+    });
+  }, 500);
+
+  const onSearchClear = () => {
+    setSearchParams((prev) => {
+      prev.delete('search');
+
+      return prev;
+    });
+  };
 
   return (
     <>
-      <AppNavbar leftContent={<AppNavbarHeading>Experiments</AppNavbarHeading>}>
-        <Button asChild className="w-fit ml-auto mr-0 hidden lg:flex">
-          <BasicLink to={routes.experimentsNew(organizationId)}>
-            New Experiment
-          </BasicLink>
-        </Button>
-      </AppNavbar>
+      <AppNavbar
+        leftContent={<AppNavbarHeading>Experiments</AppNavbarHeading>}
+      />
 
       <Outlet />
 
       <PageContentWrapper className="mt-6">
-        <div className="mb-3 flex justify-end lg:hidden">
+        <div className="mb-10 -mt-1 gap-2 flex justify-end">
+          <SearchInput
+            placeholder="Search Experiments"
+            onClear={onSearchClear}
+            onChange={onSearchChange}
+            autoFocus={!!search}
+            defaultValue={search}
+            key={search + '_search'}
+          />
+
           <Button size="sm" asChild>
             <BasicLink to={routes.experimentsNew(organizationId)}>
               New Experiment
