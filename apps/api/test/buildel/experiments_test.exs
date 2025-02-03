@@ -70,5 +70,19 @@ defmodule Buildel.ExperimentsTest do
       _another_experiment = experiment_fixture()
       assert Experiments.list_organization_experiments(organization) == [experiment]
     end
+
+    test "list_organization_experiments/1 returns searched experiments for given organization" do
+      organization = organization_fixture()
+      experiment = experiment_fixture(organization_id: organization.id, name: "TEST")
+      _another_experiment = experiment_fixture(name: "ANOTHER")
+      assert Experiments.list_organization_experiments(organization, Experiments.ListParams.from_map(%{search: "test"})) == [experiment]
+    end
+
+    test "list_organization_experiments/1 returns empty result if no experiments found for given search" do
+      organization = organization_fixture()
+      experiment = experiment_fixture(organization_id: organization.id, name: "TEST")
+      _another_experiment = experiment_fixture(name: "ANOTHER")
+      assert Experiments.list_organization_experiments(organization, Experiments.ListParams.from_map(%{search: "ANOTHER"})) == []
+    end
   end
 end
