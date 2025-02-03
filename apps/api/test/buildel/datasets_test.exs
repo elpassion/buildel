@@ -58,5 +58,19 @@ defmodule Buildel.DatasetsTest do
       _another_dataset = dataset_fixture()
       assert Datasets.list_organization_datasets(organization) == [dataset]
     end
+
+    test "list_organization_datasets/1 returns searched datasets for given organization" do
+      organization = organization_fixture()
+      dataset = dataset_fixture(organization_id: organization.id, name: "TEST")
+      _another_dataset = dataset_fixture(name: "ANOTHER")
+      assert Datasets.list_organization_datasets(organization,  Datasets.ListParams.from_map(%{search: "test"})) == [dataset]
+    end
+
+    test "list_organization_datasets/1 returns empty result if no datasets found for given search" do
+      organization = organization_fixture()
+      dataset = dataset_fixture(organization_id: organization.id, name: "TEST")
+      _another_dataset = dataset_fixture(name: "ANOTHER")
+      assert Datasets.list_organization_datasets(organization,  Datasets.ListParams.from_map(%{search: "ANOTHER"})) == []
+    end
   end
 end
