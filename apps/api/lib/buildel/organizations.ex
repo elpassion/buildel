@@ -8,6 +8,17 @@ defmodule Buildel.Organizations do
   alias Buildel.ApiKeys.ApiKey
   alias Buildel.Secrets.Secret
 
+  defmodule ListParams do
+    defstruct [:search]
+
+    def from_map(params) do
+      %__MODULE__{}
+      |> struct(%{
+        search: Map.get(params, :search, nil)
+      })
+    end
+  end
+
   def list_user_organizations(%User{} = user) do
     user |> Repo.preload(:organizations) |> Map.get(:organizations)
   end
@@ -179,6 +190,19 @@ defmodule Buildel.Organizations do
       nil -> {:error, :not_found}
       %Secret{} = secret -> {:ok, secret}
     end
+  end
+
+  def list_organization_secrets(%Organization{} = organization, %ListParams{} = params) do
+    organization
+    |> Repo.preload([secrets: (from s in Secret, order_by: [desc: s.inserted_at]) |> then(fn q ->
+      case params.search do
+        nil -> q
+        "" -> q
+        search -> q |> where([d], ilike(d.name, ^"%#{search}%"))
+      end
+    end)
+    ])
+    |> Map.get(:secrets)
   end
 
   def list_organization_secrets(%Organization{} = organization) do

@@ -1,7 +1,15 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { Outlet, useLoaderData, useMatch, useNavigate } from '@remix-run/react';
+import {
+  Outlet,
+  useLoaderData,
+  useMatch,
+  useNavigate,
+  useSearchParams,
+} from '@remix-run/react';
+import debounce from 'lodash.debounce';
 
+import { SearchInput } from '~/components/form/inputs/search.input.tsx';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
@@ -23,9 +31,27 @@ import { SecretKeyList } from './SecretKeyList';
 
 export function SecretListPage() {
   const navigate = useNavigate();
-  const { organizationId, secrets } = useLoaderData<typeof loader>();
+  const { organizationId, secrets, search } = useLoaderData<typeof loader>();
   const match = useMatch(routes.secretsNew(organizationId));
   const isSidebarOpen = !!match;
+
+  const [_, setSearchParams] = useSearchParams();
+
+  const onSearchChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchParams((prev) => {
+      prev.set('search', e.target.value);
+
+      return prev;
+    });
+  }, 500);
+
+  const onSearchClear = () => {
+    setSearchParams((prev) => {
+      prev.delete('search');
+
+      return prev;
+    });
+  };
 
   const handleCloseSidebar = (value: boolean) => {
     if (value) return;
@@ -45,13 +71,7 @@ export function SecretListPage() {
             />
           </AppNavbarHeading>
         }
-      >
-        <Button asChild className="hidden w-fit ml-auto mr-0 lg:flex">
-          <BasicLink to={routes.secretsNew(organizationId)}>
-            New Secret
-          </BasicLink>
-        </Button>
-      </AppNavbar>
+      ></AppNavbar>
 
       <DialogDrawer open={isSidebarOpen} onOpenChange={handleCloseSidebar}>
         <DialogDrawerContent>
@@ -69,7 +89,16 @@ export function SecretListPage() {
       </DialogDrawer>
 
       <PageContentWrapper className="mt-6">
-        <div className="mb-3 flex gap-2 justify-end items-center lg:hidden">
+        <div className="mb-10 -mt-1  flex gap-2 justify-end items-center">
+          <SearchInput
+            placeholder="Search Secrets"
+            onClear={onSearchClear}
+            onChange={onSearchChange}
+            autoFocus={!!search}
+            defaultValue={search}
+            key={search + '_search'}
+          />
+
           <Button asChild size="sm">
             <BasicLink to={routes.secretsNew(organizationId)}>
               New Secret

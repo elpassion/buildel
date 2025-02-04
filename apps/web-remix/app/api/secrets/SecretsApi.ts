@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
+import type { PaginationQueryParams } from '~/components/pagination/usePagination';
 import type { fetchTyped } from '~/utils/fetch.server';
+import { buildUrlWithParams } from '~/utils/url';
 
 import { SecretKeyListResponse, SecretKeyResponse } from './secrets.contracts';
 import type {
@@ -14,11 +16,14 @@ export class SecretsApi {
   async getSecrets(
     organizationId: string | number,
     includeAliases: boolean = false,
+    queryParams: Partial<PaginationQueryParams>,
   ) {
-    return this.client(
-      SecretKeyListResponse,
+    const url = buildUrlWithParams(
       `/organizations/${organizationId}/secrets?include_aliases=${includeAliases}`,
+      { ...queryParams },
     );
+
+    return this.client(SecretKeyListResponse, url);
   }
 
   async deleteSecret(organizationId: string | number, name: string) {

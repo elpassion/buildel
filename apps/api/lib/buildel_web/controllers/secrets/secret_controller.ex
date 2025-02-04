@@ -1,4 +1,6 @@
 defmodule BuildelWeb.SecretController do
+  alias OpenApiSpex.Schema
+
   import BuildelWeb.UserAuth
   use BuildelWeb, :controller
   use OpenApiSpex.ControllerSpecs
@@ -52,6 +54,12 @@ defmodule BuildelWeb.SecretController do
         description: "Should endpoint return secret aliases",
         type: :boolean,
         required: false
+      ],
+      search: [
+        in: :query,
+        description: "Search query",
+        schema: %Schema{type: :string},
+        required: false
       ]
     ],
     request_body: nil,
@@ -70,10 +78,13 @@ defmodule BuildelWeb.SecretController do
     %{organization_id: organization_id} = conn.params
     user = conn.assigns.current_user
 
+    params =
+      Buildel.Organizations.ListParams.from_map(conn.params)
+
     with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
          secrets <-
-           Buildel.Organizations.list_organization_secrets(organization) do
+           Buildel.Organizations.list_organization_secrets(organization, params) do
       render(conn, :index, secrets: secrets, include_aliases: conn.params[:include_aliases])
     end
   end
