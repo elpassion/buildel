@@ -4,6 +4,7 @@ import { describe, test } from 'vitest';
 import { loader as loginLoader } from '~/components/pages/auth/login/loader.server';
 import { LoginPage } from '~/components/pages/auth/login/page';
 import { action as resetPasswordAction } from '~/components/pages/auth/reset-password/action.server';
+import { loader as resetPasswordLoader } from '~/components/pages/auth/reset-password/loader.server';
 import { ResetPasswordPage } from '~/components/pages/auth/reset-password/page';
 import { action as setPasswordAction } from '~/components/pages/auth/set-password/action.server';
 import { loader as setPasswordLoader } from '~/components/pages/auth/set-password/loader.server';
@@ -41,9 +42,11 @@ describe('Reset password flow', () => {
   });
 
   test('should show Sent Instructions page', async () => {
-    new ResetPasswordObject().render({
+    const page = new ResetPasswordObject().render({
       initialEntries: ['/reset-password'],
     });
+
+    await page.setCaptcha();
 
     const email = await InputHandle.fromLabelText(/email/i);
     const button = await ButtonHandle.fromRole('Send instructions');
@@ -117,6 +120,7 @@ class ResetPasswordObject {
       {
         path: '/reset-password',
         Component: ResetPasswordPage,
+        loader: resetPasswordLoader,
         action: resetPasswordAction,
       },
       {
@@ -144,5 +148,10 @@ class ResetPasswordObject {
   async setNewConfirmPassword(value: string) {
     const password = await InputHandle.fromTestId('new-password-confirmation');
     await password.type(value);
+  }
+
+  async setCaptcha() {
+    const captcha = await InputHandle.fromTestId('mock-v2-captcha-element');
+    await captcha.type('12345678901234567890');
   }
 }
