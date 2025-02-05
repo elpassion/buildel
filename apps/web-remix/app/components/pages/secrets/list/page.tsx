@@ -30,6 +30,7 @@ import type { loader } from './loader.server';
 import { SecretKeyList } from './SecretKeyList';
 
 export function SecretListPage() {
+  const ref = React.useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { organizationId, secrets, search } = useLoaderData<typeof loader>();
   const match = useMatch(routes.secretsNew(organizationId));
@@ -51,6 +52,11 @@ export function SecretListPage() {
 
       return prev;
     });
+
+    if (ref.current) {
+      ref.current.value = '';
+      ref.current.focus();
+    }
   };
 
   const handleCloseSidebar = (value: boolean) => {
@@ -96,7 +102,7 @@ export function SecretListPage() {
             onChange={onSearchChange}
             autoFocus={!!search}
             defaultValue={search}
-            key={search + '_search'}
+            ref={ref}
           />
 
           <Button asChild size="sm">
