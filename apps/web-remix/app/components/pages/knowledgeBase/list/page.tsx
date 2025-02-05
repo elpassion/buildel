@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { MetaFunction } from '@remix-run/node';
 import {
@@ -102,6 +102,7 @@ function CollectionsFilter({
   children,
   ...rest
 }: CollectionsFilterProps) {
+  const ref = useRef<HTMLInputElement>(null);
   const [_, setSearchParams] = useSearchParams();
   const organizationId = useOrganizationId();
 
@@ -119,6 +120,11 @@ function CollectionsFilter({
 
       return prev;
     });
+
+    if (ref.current) {
+      ref.current.value = '';
+      ref.current.focus();
+    }
   };
 
   return (
@@ -127,12 +133,12 @@ function CollectionsFilter({
       {...rest}
     >
       <SearchInput
+        ref={ref}
         placeholder="Search Collections"
         onClear={onSearchClear}
         onChange={onSearchChange}
         autoFocus={!!defaultValues?.search}
         defaultValue={defaultValues?.search}
-        key={defaultValues?.search}
       />
 
       <Button size="sm" asChild>
