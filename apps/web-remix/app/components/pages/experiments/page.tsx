@@ -15,6 +15,7 @@ import { routes } from '~/utils/routes.utils';
 import type { loader } from './loader.server';
 
 export function ExperimentsPage() {
+  const ref = React.useRef<HTMLInputElement>(null);
   const { organizationId, experiments, search } =
     useLoaderData<typeof loader>();
 
@@ -34,6 +35,11 @@ export function ExperimentsPage() {
 
       return prev;
     });
+
+    if (ref.current) {
+      ref.current.value = '';
+      ref.current.focus();
+    }
   };
 
   return (
@@ -52,7 +58,7 @@ export function ExperimentsPage() {
             onChange={onSearchChange}
             autoFocus={!!search}
             defaultValue={search}
-            key={search + '_search'}
+            ref={ref}
           />
 
           <Button size="sm" asChild>

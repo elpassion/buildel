@@ -15,6 +15,7 @@ import { DatasetsList } from './DatasetsList';
 import type { loader } from './loader.server';
 
 export function DatasetsPage() {
+  const ref = React.useRef<HTMLInputElement>(null);
   const { organizationId, datasets, search } = useLoaderData<typeof loader>();
 
   const [_, setSearchParams] = useSearchParams();
@@ -33,6 +34,11 @@ export function DatasetsPage() {
 
       return prev;
     });
+
+    if (ref.current) {
+      ref.current.value = '';
+      ref.current.focus();
+    }
   };
 
   return (
@@ -49,7 +55,7 @@ export function DatasetsPage() {
             onChange={onSearchChange}
             autoFocus={!!search}
             defaultValue={search}
-            key={search + '_search'}
+            ref={ref}
           />
 
           <Button size="sm" asChild>
