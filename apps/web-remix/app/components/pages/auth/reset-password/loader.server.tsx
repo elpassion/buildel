@@ -5,5 +5,5 @@ import { requireNotLogin } from '~/session.server';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await requireNotLogin(request);
-  return json({});
+  return json({ googleCaptchaKey: process.env.GOOGLE_CAPTCHA_KEY ?? null });
 }
