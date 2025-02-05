@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { MetaFunction } from '@remix-run/node';
 import {
@@ -64,14 +64,7 @@ export function PipelinesPage() {
       <Outlet />
 
       <PageContentWrapper className="grid grid-cols-1 gap-8 mt-6 lg:grid-cols-1">
-        <React.Fragment
-          key={routes.pipelines(organizationId, {
-            search: pagination.search,
-            sort: pagination.sort,
-          })}
-        >
-          {pipelinesContent}
-        </React.Fragment>
+        {pipelinesContent}
       </PageContentWrapper>
     </>
   );
@@ -158,6 +151,7 @@ function ContentWithFilters({ search, sort }: ContentWithFiltersProps) {
       <ContentWithPipelines
         key={routes.pipelines(organizationId, {
           search,
+          sort,
         })}
       />
     </>
@@ -330,6 +324,7 @@ function PipelinesFilter({
   children,
   ...rest
 }: PipelinesFilterProps) {
+  const ref = useRef<HTMLInputElement>(null);
   const [_, setSearchParams] = useSearchParams();
   const organizationId = useOrganizationId();
 
@@ -347,6 +342,11 @@ function PipelinesFilter({
 
       return prev;
     });
+
+    if (ref.current) {
+      ref.current.value = '';
+      ref.current.focus();
+    }
   };
 
   const onSortChange = (value: string) => {
@@ -362,6 +362,7 @@ function PipelinesFilter({
       {...rest}
     >
       <SearchInput
+        ref={ref}
         placeholder="Search Workflows"
         onClear={onSearchClear}
         onChange={onSearchChange}
