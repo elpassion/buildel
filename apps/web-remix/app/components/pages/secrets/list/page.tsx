@@ -1,18 +1,11 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import {
-  Outlet,
-  useLoaderData,
-  useMatch,
-  useNavigate,
-  useSearchParams,
-} from '@remix-run/react';
-import debounce from 'lodash.debounce';
+import { Outlet, useLoaderData, useMatch, useNavigate } from '@remix-run/react';
 
-import { SearchInput } from '~/components/form/inputs/search.input.tsx';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
+import { PageSearch } from '~/components/search/PageSearch';
 import { HelpfulIcon } from '~/components/tooltip/HelpfulIcon';
 import { Button } from '~/components/ui/button';
 import {
@@ -30,34 +23,10 @@ import type { loader } from './loader.server';
 import { SecretKeyList } from './SecretKeyList';
 
 export function SecretListPage() {
-  const ref = React.useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { organizationId, secrets, search } = useLoaderData<typeof loader>();
   const match = useMatch(routes.secretsNew(organizationId));
   const isSidebarOpen = !!match;
-
-  const [_, setSearchParams] = useSearchParams();
-
-  const onSearchChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchParams((prev) => {
-      prev.set('search', e.target.value);
-
-      return prev;
-    });
-  }, 500);
-
-  const onSearchClear = () => {
-    setSearchParams((prev) => {
-      prev.delete('search');
-
-      return prev;
-    });
-
-    if (ref.current) {
-      ref.current.value = '';
-      ref.current.focus();
-    }
-  };
 
   const handleCloseSidebar = (value: boolean) => {
     if (value) return;
@@ -96,14 +65,7 @@ export function SecretListPage() {
 
       <PageContentWrapper className="mt-6">
         <div className="mb-10 -mt-1  flex gap-2 justify-end items-center">
-          <SearchInput
-            placeholder="Search Secrets"
-            onClear={onSearchClear}
-            onChange={onSearchChange}
-            autoFocus={!!search}
-            defaultValue={search}
-            ref={ref}
-          />
+          <PageSearch placeholder="Search Secrets" defaultValue={search} />
 
           <Button asChild size="sm">
             <BasicLink to={routes.secretsNew(organizationId)}>

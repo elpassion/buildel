@@ -1,16 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { MetaFunction } from '@remix-run/node';
-import {
-  Outlet,
-  useLoaderData,
-  useMatch,
-  useNavigate,
-  useSearchParams,
-} from '@remix-run/react';
-import debounce from 'lodash.debounce';
+import { Outlet, useLoaderData, useMatch, useNavigate } from '@remix-run/react';
 
-import { SearchInput } from '~/components/form/inputs/search.input.tsx';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
@@ -18,6 +10,7 @@ import type { IKnowledgeBaseCollection } from '~/components/pages/knowledgeBase/
 import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
 import { useInfiniteFetch } from '~/components/pagination/useInfiniteFetch';
 import type { Pagination } from '~/components/pagination/usePagination';
+import { PageSearch } from '~/components/search/PageSearch';
 import { Button } from '~/components/ui/button';
 import {
   DialogDrawer,
@@ -102,42 +95,15 @@ function CollectionsFilter({
   children,
   ...rest
 }: CollectionsFilterProps) {
-  const ref = useRef<HTMLInputElement>(null);
-  const [_, setSearchParams] = useSearchParams();
   const organizationId = useOrganizationId();
-
-  const onSearchChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchParams((prev) => {
-      prev.set('search', e.target.value);
-
-      return prev;
-    });
-  }, 500);
-
-  const onSearchClear = () => {
-    setSearchParams((prev) => {
-      prev.set('search', '');
-
-      return prev;
-    });
-
-    if (ref.current) {
-      ref.current.value = '';
-      ref.current.focus();
-    }
-  };
 
   return (
     <div
       className={cn('w-full flex gap-2 items-center justify-end', className)}
       {...rest}
     >
-      <SearchInput
-        ref={ref}
+      <PageSearch
         placeholder="Search Collections"
-        onClear={onSearchClear}
-        onChange={onSearchChange}
-        autoFocus={!!defaultValues?.search}
         defaultValue={defaultValues?.search}
       />
 

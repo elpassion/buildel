@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { MetaFunction } from '@remix-run/node';
 import {
@@ -7,10 +7,8 @@ import {
   useLoaderData,
   useSearchParams,
 } from '@remix-run/react';
-import debounce from 'lodash.debounce';
 import { BookmarkCheck } from 'lucide-react';
 
-import { SearchInput } from '~/components/form/inputs/search.input.tsx';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { confirm } from '~/components/modal/confirm';
@@ -18,6 +16,7 @@ import { PipelinesList } from '~/components/pages/pipelines/list/PipelinesList';
 import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
 import { useInfiniteFetch } from '~/components/pagination/useInfiniteFetch';
+import { PageSearch } from '~/components/search/PageSearch';
 import { Button } from '~/components/ui/button';
 import {
   Select,
@@ -324,30 +323,8 @@ function PipelinesFilter({
   children,
   ...rest
 }: PipelinesFilterProps) {
-  const ref = useRef<HTMLInputElement>(null);
   const [_, setSearchParams] = useSearchParams();
   const organizationId = useOrganizationId();
-
-  const onSearchChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchParams((prev) => {
-      prev.set('search', e.target.value);
-
-      return prev;
-    });
-  }, 500);
-
-  const onSearchClear = () => {
-    setSearchParams((prev) => {
-      prev.set('search', '');
-
-      return prev;
-    });
-
-    if (ref.current) {
-      ref.current.value = '';
-      ref.current.focus();
-    }
-  };
 
   const onSortChange = (value: string) => {
     setSearchParams((prev) => {
@@ -361,12 +338,8 @@ function PipelinesFilter({
       className={cn('w-full flex gap-2 items-center justify-end', className)}
       {...rest}
     >
-      <SearchInput
-        ref={ref}
+      <PageSearch
         placeholder="Search Workflows"
-        onClear={onSearchClear}
-        onChange={onSearchChange}
-        autoFocus={!!defaultValues?.search}
         defaultValue={defaultValues?.search}
       />
 
