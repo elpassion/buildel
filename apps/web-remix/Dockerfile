@@ -1,10 +1,10 @@
-FROM node:22-alpine AS base
+FROM node:21-alpine AS base
 RUN apk add --no-cache libc6-compat
 RUN apk update
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable && corepack prepare pnpm@9.4.0 --activate
+RUN corepack enable
 
 WORKDIR /app
 
