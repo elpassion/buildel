@@ -523,8 +523,13 @@ defmodule Buildel.Blocks.Chat do
             required: ["message"]
           }
         },
-        call_formatter: fn args ->
-          args = %{"config.args" => args, "config.block_name" => state.block.name}
+        call_formatter: fn props ->
+          args = state.available_metadata
+            |> Enum.into(%{}, fn {key, value} -> {"metadata." <> key, value} end)
+            |> Map.merge(%{
+            "config.args" => props,
+            "config.block_name" => state.block.name
+          })
           build_call_formatter(state.block.opts.call_formatter, args)
         end,
         response_formatter: fn _response ->

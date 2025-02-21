@@ -83,11 +83,22 @@ defmodule Buildel.Blocks.Browser do
 
   @impl true
   def setup(%{opts: opts} = state) do
+    flattened_metadata = FlattenMap.flatten(opts.metadata)
+
     {:ok,
      state
      |> Map.put(
        :call_formatter,
-       opts |> Map.get(:call_formatter, "Browse 📑: \"{{config.args}}\"\n")
+       opts
+       |> Map.get(:call_formatter, "Browse 📑: \"{{config.args}}\"\n")
+       |> Map.put(
+         :available_metadata,
+         Injectable.used_metadata_keys([opts.url, opts.headers, opts.call_formatter])
+         |> Enum.reduce(%{}, fn key, acc ->
+          acc
+          |> Map.put(key, flattened_metadata[key])
+        end)
+      )
      )
      |> Map.put(:host, opts |> Map.get(:host, ""))}
   end
@@ -174,8 +185,14 @@ defmodule Buildel.Blocks.Browser do
             required: ["url"]
           }
         },
-        call_formatter: fn args ->
-          args = %{"config.args" => args, "config.block_name" => state.block.name}
+        call_formatter: fn props ->
+          args = state.available_metadata
+                 |> Enum.into(%{}, fn {key, value} -> {"metadata." <> key, value} end)
+                 |> Map.merge(%{
+                  "config.args" => props,
+                  "config.block_name" => state.block.name
+                })
+
           build_call_formatter(state.call_formatter, args)
         end,
         response_formatter: fn _response ->
@@ -226,6 +243,9 @@ defmodule Buildel.Blocks.Browser do
         String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
 
       {key, value}, acc when is_map(value) ->
+        String.replace(acc, "{{#{key}}}", Jason.encode!(value))
+
+      {key, value}, acc when is_list(value) ->
         String.replace(acc, "{{#{key}}}", Jason.encode!(value))
 
       _, acc ->

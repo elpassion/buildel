@@ -286,6 +286,9 @@ defmodule Buildel.Blocks.ApiCallTool do
       {key, value}, acc when is_map(value) ->
         String.replace(acc, "{{#{key}}}", Jason.encode!(value))
 
+      {key, value}, acc when is_list(value) ->
+        String.replace(acc, "{{#{key}}}", Jason.encode!(value))
+
       _, acc ->
         acc
     end)
