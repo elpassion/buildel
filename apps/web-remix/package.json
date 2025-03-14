@@ -132,7 +132,8 @@
       "cookie": "^0.7.0",
       "express>path-to-regexp": "0.1.12",
       "@babel/helpers": "^7.26.10",
-      "@babel/runtime": "^7.26.10"
+      "@babel/runtime": "^7.26.10",
+      "esbuild": "0.25.0"
     }
   },
   "devDependencies": {
