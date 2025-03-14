@@ -34,6 +34,7 @@ FROM base as release
 ENV NODE_ENV production
 ENV PORT="8080"
 ENV METRICS_PORT="8081"
+ENV COREPACK_ENABLE=0
 
 COPY --from=prod-deps /app/node_modules /app/node_modules
 
@@ -48,6 +49,7 @@ COPY --from=build /app/build/client /app/build/client
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 web
+RUN chown -R web:nodejs /app
 USER web
 
 CMD [ "pnpm", "start" ]
