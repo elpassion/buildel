@@ -1,5 +1,4 @@
 import { installGlobals } from '@remix-run/node';
-import { fastifyEarlyHints } from '@fastify/early-hints';
 import etag from '@fastify/etag';
 import helmet from '@fastify/helmet';
 import { fastifyHttpProxy } from '@fastify/http-proxy';
@@ -49,8 +48,6 @@ if (vite) {
   });
 }
 
-await app.register(fastifyEarlyHints, { warn: true });
-
 await app.register(fastifyHttpProxy, {
   upstream: process.env.API_URL,
   prefix: '/super-api/socket',
@@ -81,7 +78,6 @@ await app.register(fastifyHttpProxy, {
   prefix: '/youtube',
   rewritePrefix: '',
 });
-
 
 await app.register(fastifyStatic, {
   root: path.join(__dirname, 'build', 'client'),
