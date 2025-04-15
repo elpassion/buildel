@@ -1,17 +1,4 @@
 version = 1
 
 [[analyzers]]
-name = "test-coverage"
-enabled = true
-
-[[analyzers]]
-name = "python"
-
-  [analyzers.meta]
-  runtime_version = "3.x.x"
-
-[[analyzers]]
 name = "javascript"
-
-[[analyzers]]
-name = "shell"
