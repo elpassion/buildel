@@ -57,6 +57,7 @@ config :nx, :default_backend, EXLA.Backend
 
 config :req, :default_options, pool_timeout: 60_000
 
+config :buildel, :openai, Buildel.Clients.Openai
 config :buildel, :deepgram, Buildel.Clients.Deepgram
 config :buildel, :elevenlabs, Buildel.Clients.Elevenlabs
 config :buildel, :webhook, Buildel.Clients.Webhook

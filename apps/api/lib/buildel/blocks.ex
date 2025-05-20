@@ -44,7 +44,8 @@ defmodule Buildel.Blocks do
     CollectAllAudio,
     SharepointClient,
     Video,
-    TextToFile
+    TextToFile,
+    OpenaiSpeechToText
   }
 
   @names_to_blocks_map %{
@@ -87,7 +88,8 @@ defmodule Buildel.Blocks do
     "collect_all_audio" => CollectAllAudio,
     "sharepoint_client" => SharepointClient,
     "video" => Video,
-    "text_to_file" => TextToFile
+    "text_to_file" => TextToFile,
+    "openai_speech_to_text" => OpenaiSpeechToText
   }
 
   @blocks_to_names_map %{
@@ -130,7 +132,8 @@ defmodule Buildel.Blocks do
     CollectAllAudio => "collect_all_audio",
     SharepointClient => "sharepoint_client",
     Video => "video",
-    TextToFile => "text_to_file"
+    TextToFile => "text_to_file",
+    OpenaiSpeechToText => "openai_speech_to_text"
   }
 
   def list_types() do

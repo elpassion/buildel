@@ -37,6 +37,7 @@ config :phoenix, :plug_init_mode, :runtime
 
 config :buildel, :secret_key_base, "secret_key_base"
 
+config :buildel, :openai, Buildel.ClientMocks.Openai
 config :buildel, :deepgram, Buildel.ClientMocks.Deepgram
 config :buildel, :elevenlabs, Buildel.ClientMocks.Elevenlabs
 config :buildel, :webhook, Buildel.ClientMocks.Webhook
