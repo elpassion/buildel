@@ -38,6 +38,9 @@ defmodule Buildel.Blocks.BrowserTest do
             Browser.create(%{
               name: "test",
               opts: %{
+                metadata: %{},
+                headers: "{}",
+                host: "https://jsonplaceholder.typicode.com",
                 call_formatter: "custom formatter {{config.args}}\n"
               },
               connections: [

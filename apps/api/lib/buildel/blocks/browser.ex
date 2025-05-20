@@ -5,6 +5,8 @@ defmodule Buildel.Blocks.Browser do
   alias Buildel.Crawler
   alias Buildel.Blocks.Fields.EditorField.Suggestion
   alias Buildel.Blocks.Fields.EditorField
+  alias Buildel.FlattenMap
+  alias Buildel.Blocks.Utils.Injectable
 
   # Config
 
@@ -61,8 +63,7 @@ defmodule Buildel.Blocks.Browser do
                     description:
                       "Valid JSON object of the headers to be sent with the request. i.e. `{\"Content-Type\": \"application/json\"}`.",
                     editorLanguage: "json",
-                    default:
-                      "{}",
+                    default: "{}",
                     minLength: 1,
                     suggestions: []
                   }),
@@ -91,14 +92,14 @@ defmodule Buildel.Blocks.Browser do
        :call_formatter,
        opts
        |> Map.get(:call_formatter, "Browse 📑: \"{{config.args}}\"\n")
-       |> Map.put(
-         :available_metadata,
-         Injectable.used_metadata_keys([opts.url, opts.headers, opts.call_formatter])
-         |> Enum.reduce(%{}, fn key, acc ->
-          acc
-          |> Map.put(key, flattened_metadata[key])
-        end)
-      )
+     )
+     |> Map.put(
+       :available_metadata,
+       Injectable.used_metadata_keys([opts.host, opts.headers, opts.call_formatter])
+       |> Enum.reduce(%{}, fn key, acc ->
+         acc
+         |> Map.put(key, flattened_metadata[key])
+       end)
      )
      |> Map.put(:host, opts |> Map.get(:host, ""))}
   end
@@ -186,12 +187,13 @@ defmodule Buildel.Blocks.Browser do
           }
         },
         call_formatter: fn props ->
-          args = state.available_metadata
-                 |> Enum.into(%{}, fn {key, value} -> {"metadata." <> key, value} end)
-                 |> Map.merge(%{
-                  "config.args" => props,
-                  "config.block_name" => state.block.name
-                })
+          args =
+            state.available_metadata
+            |> Enum.into(%{}, fn {key, value} -> {"metadata." <> key, value} end)
+            |> Map.merge(%{
+              "config.args" => props,
+              "config.block_name" => state.block.name
+            })
 
           build_call_formatter(state.call_formatter, args)
         end,
@@ -274,7 +276,6 @@ defmodule Buildel.Blocks.Browser do
   defp does_url_match_host(_, _) do
     {:ok, false}
   end
-
 
   defp build_headers(headers_string, args) do
     args
