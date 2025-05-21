@@ -106,7 +106,7 @@ jobs:
         run: |
           
           if [ "${{ github.event_name }}" == "push" ]; then
-          echo "tags=ghcr.io/${{ github.repository }}/api:${{ github.sha }},ghcr.io/${{ github.repository }}/api:alpha" >> $GITHUB_ENV
+          echo "tags=ghcr.io/${{ github.repository }}/api:${{ github.sha }},ghcr.io/${{ github.repository }}/api:alpha,ghcr.io/${{ github.repository }}/api:latest" >> $GITHUB_ENV
           fi
         
           if [ "${{ github.event_name }}" == "release" ]; then
